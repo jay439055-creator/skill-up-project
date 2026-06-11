@@ -83,11 +83,11 @@ function resizeCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext
 }
 
 function projectDot(dot: Dot, metrics: StageMetrics, lift: number, shimmer: number): Projection {
-  const depth = dot.z ** 1.88;
+  const depth = dot.z ** (1.88 + clamp01((720 - metrics.width) / 330) * 0.38);
   const scale = 0.12 + dot.z * 1.48;
-  const x = metrics.centerX + dot.x * metrics.width * 0.53 * scale;
-  const y = metrics.horizonY + depth * (metrics.floorY - metrics.horizonY) - lift * (0.28 + dot.z);
-  const radius = 0.34 + dot.z * 1.9 + shimmer * 1.55;
+  const x = metrics.centerX + dot.x * Math.max(metrics.width, 760) * 0.53 * scale;
+  const y = metrics.horizonY + depth * (metrics.floorY - metrics.horizonY) - lift * (0.28 + dot.z) + clamp01((720 - metrics.width) / 330) * (dot.x ** 2 * 84 + Math.sin(dot.seed * 91.7) * 7) * (0.35 + dot.z);
+  const radius = (0.34 + dot.z * 1.9 + shimmer * 1.55) * (1 - clamp01((720 - metrics.width) / 330) * 0.32);
   const alpha = clamp01((0.12 + dot.z * 0.6 + shimmer * 0.76) * Math.sin(Math.PI * dot.z) ** 0.44);
 
   return { alpha, radius, x, y };
@@ -107,7 +107,7 @@ function pointerToWorld(pointer: PointerState, metrics: StageMetrics): { readonl
   const yProgress = clamp01((pointer.y - metrics.horizonY) / Math.max(metrics.floorY - metrics.horizonY, 1));
   const z = yProgress ** 0.54;
   const scale = 0.12 + z * 1.48;
-  const x = Math.min(Math.max((pointer.x - metrics.centerX) / (metrics.width * 0.53 * scale), -1), 1);
+  const x = Math.min(Math.max((pointer.x - metrics.centerX) / (Math.max(metrics.width, 760) * 0.53 * scale), -1), 1);
 
   return { x, z };
 }
@@ -133,8 +133,7 @@ export function RippleMotionCanvas() {
     const ripples: Ripple[] = [];
     let frameId = 0;
     let introTimerId = 0;
-    let lastInteractionAt = 0;
-    let lastPointerRippleAt = 0;
+    let lastInteractionAt = 0, lastPointerRippleAt = 0, fieldFade = 0;
     let startedAt = performance.now();
     let metrics = resizeCanvas(canvas, context);
 
@@ -157,11 +156,11 @@ export function RippleMotionCanvas() {
     };
 
     const drawStage = () => {
-      const gradient = context.createLinearGradient(0, 0, 0, metrics.height);
-      gradient.addColorStop(0, "rgb(2 3 4 / 1)");
-      gradient.addColorStop(0.36, "rgb(8 9 10 / 1)");
-      gradient.addColorStop(1, "rgb(0 1 2 / 1)");
-      context.fillStyle = gradient;
+      const veil = context.createLinearGradient(0, 0, metrics.width, metrics.height);
+      veil.addColorStop(0, "rgb(4 8 13 / 0.1)");
+      veil.addColorStop(0.46, "rgb(2 9 18 / 0.14)");
+      veil.addColorStop(1, "rgb(0 4 9 / 0.28)");
+      context.fillStyle = veil;
       context.fillRect(0, 0, metrics.width, metrics.height);
     };
 
@@ -207,28 +206,27 @@ export function RippleMotionCanvas() {
         addRipple({ startedAt: impactAt, strength: 1.32, x: 0, z: RIPPLE_ORIGIN_Z });
       }
 
+      const ripplesAlive = ripples.some((ripple) => now - ripple.startedAt < 2800), pointerAlive = pointer.active && now - lastInteractionAt < POINTER_SETTLE_MS;
+      const activeField = introProgress < 1 ? 1 : Math.max(ripplesAlive ? 0.82 : 0, pointerAlive ? 1 : 0);
+      fieldFade = activeField > fieldFade ? activeField : fieldFade * 0.94;
+      context.globalCompositeOperation = "screen";
       for (const dot of dots) {
         const reveal = reducedMotion ? 1 : clamp01((introProgress - dot.z * 0.16) / 0.56);
-        if (reveal <= 0) {
-          continue;
-        }
-
         const wave = ripples.reduce((total, ripple) => total + rippleAmount(dot, ripple, now), 0);
-        const drift = Math.sin(now / 780 + dot.seed * 0.19) * 0.7 * dot.z;
+        const glow = clamp01(Math.abs(wave) * 1.8);
+        const dotAlpha = reveal * Math.max(fieldFade, glow);
+        if (dotAlpha <= 0.01) continue;
+        const drift = Math.sin(now / 780 + dot.seed * 0.19) * (0.7 + clamp01((720 - metrics.width) / 330) * 3.2) * dot.z;
         const projection = projectDot(dot, metrics, wave * 52 + drift, Math.abs(wave) * 1.55);
-        context.globalAlpha = reveal;
-        context.fillStyle = `rgb(205 232 243 / ${projection.alpha})`;
-        context.beginPath();
-        context.arc(projection.x, projection.y, projection.radius, 0, Math.PI * 2);
-        context.fill();
+        context.globalAlpha = dotAlpha;
+        context.fillStyle = `rgb(224 248 255 / ${clamp01(projection.alpha * (1 + glow * 0.8))})`;
+        context.beginPath(); context.arc(projection.x, projection.y, projection.radius * (0.76 + glow * 0.72), 0, Math.PI * 2); context.fill();
       }
 
-      context.globalAlpha = 1;
-      drawDrop(introProgress);
+      context.globalAlpha = 1; drawDrop(introProgress);
 
-      const ripplesAlive = ripples.some((ripple) => now - ripple.startedAt < 2800);
-      const pointerAlive = pointer.active && now - lastInteractionAt < POINTER_SETTLE_MS;
-      if (introProgress < 1 || ripplesAlive || pointerAlive) {
+      context.globalCompositeOperation = "source-over";
+      if (introProgress < 1 || ripplesAlive || pointerAlive || fieldFade > 0.02) {
         frameId = window.requestAnimationFrame(render);
       }
     };

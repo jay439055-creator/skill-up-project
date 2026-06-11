@@ -732,9 +732,30 @@ footer address {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background: #020304;
+  background:
+    radial-gradient(980px 820px at 0 0, rgb(255 255 255 / 82%), rgb(241 247 255 / 48%) 44%, transparent 76%),
+    radial-gradient(860px 680px at 22% 34%, rgb(255 230 239 / 34%), transparent 72%),
+    radial-gradient(1180px 860px at 72% 22%, rgb(178 216 255 / 58%), transparent 76%),
+    radial-gradient(1120px 880px at 74% 78%, rgb(118 169 218 / 34%), transparent 74%),
+    linear-gradient(132deg, #f8fbff 0%, #c9def3 42%, #8bb4dd 72%, #6f93b8 100%);
   color: #e7f6ff;
   isolation: isolate;
+}
+
+.ripple_experience::before {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background:
+    radial-gradient(780px 560px at 6% 0, rgb(255 255 255 / 34%), transparent 76%),
+    radial-gradient(560px 300px at 62% 4%, rgb(255 249 235 / 20%), transparent 70%),
+    radial-gradient(720px 460px at 44% 43%, rgb(212 241 255 / 22%), transparent 72%),
+    linear-gradient(17deg, transparent 0%, rgb(255 232 229 / 28%) 31%, transparent 56%),
+    linear-gradient(164deg, rgb(255 255 255 / 20%) 0%, transparent 31%, rgb(113 183 255 / 16%) 76%, transparent 100%);
+  content: "";
+  filter: blur(22px);
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .ripple_motion_canvas {
@@ -744,13 +765,13 @@ footer address {
   display: block;
   width: 100vw;
   height: 100vh;
-  background: #020304;
+  background: transparent;
   cursor: crosshair;
 }
 
 .ripple_frame {
   position: fixed;
-  z-index: 2;
+  z-index: 4;
   inset: 18px;
   pointer-events: none;
 }
@@ -792,7 +813,7 @@ footer address {
 
 .ripple_panel {
   position: relative;
-  z-index: 3;
+  z-index: 5;
   display: grid;
   align-content: start;
   gap: 14px;
@@ -803,7 +824,7 @@ footer address {
 }
 
 .ripple_panel p {
-  color: rgb(231 246 255 / 62%);
+  color: rgb(255 255 255 / 84%);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -811,11 +832,12 @@ footer address {
 
 .ripple_panel h1 {
   margin: 0;
-  color: rgb(231 246 255 / 92%);
+  color: rgb(255 255 255 / 100%);
   font-size: clamp(42px, 7vw, 96px);
   font-weight: 900;
   line-height: 0.88;
   letter-spacing: 0;
+  text-shadow: 0 10px 34px rgb(36 78 112 / 18%);
 }
 
 .ripple_status {
@@ -827,9 +849,9 @@ footer address {
 
 .ripple_status span {
   padding: 7px 10px;
-  border: 1px solid rgb(231 246 255 / 24%);
+  border: 1px solid rgb(255 255 255 / 36%);
   border-radius: 999px;
-  color: rgb(231 246 255 / 70%);
+  color: rgb(255 255 255 / 88%);
   font-size: 11px;
   font-weight: 800;
 }
