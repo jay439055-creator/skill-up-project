@@ -75,9 +75,9 @@ function resizeCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext
 
   return {
     centerX: width / 2,
-    floorY: height * 0.98,
+    floorY: height * 1.2,
     height,
-    horizonY: height * 0.34,
+    horizonY: height * 0.29,
     width,
   };
 }
@@ -85,7 +85,7 @@ function resizeCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext
 function projectDot(dot: Dot, metrics: StageMetrics, lift: number, shimmer: number): Projection {
   const depth = dot.z ** 1.88;
   const scale = 0.12 + dot.z * 1.48;
-  const x = metrics.centerX + dot.x * metrics.width * 0.46 * scale;
+  const x = metrics.centerX + dot.x * metrics.width * 0.53 * scale;
   const y = metrics.horizonY + depth * (metrics.floorY - metrics.horizonY) - lift * (0.28 + dot.z);
   const radius = 0.34 + dot.z * 1.9 + shimmer * 1.55;
   const alpha = clamp01((0.12 + dot.z * 0.6 + shimmer * 0.76) * Math.sin(Math.PI * dot.z) ** 0.44);
@@ -107,7 +107,7 @@ function pointerToWorld(pointer: PointerState, metrics: StageMetrics): { readonl
   const yProgress = clamp01((pointer.y - metrics.horizonY) / Math.max(metrics.floorY - metrics.horizonY, 1));
   const z = yProgress ** 0.54;
   const scale = 0.12 + z * 1.48;
-  const x = Math.min(Math.max((pointer.x - metrics.centerX) / (metrics.width * 0.46 * scale), -1), 1);
+  const x = Math.min(Math.max((pointer.x - metrics.centerX) / (metrics.width * 0.53 * scale), -1), 1);
 
   return { x, z };
 }

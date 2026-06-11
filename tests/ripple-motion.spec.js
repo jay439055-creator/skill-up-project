@@ -38,7 +38,7 @@ test("intro drop lands on the same point where the first ripple starts", async (
   expect(Math.abs(timing.dropY - timing.rippleY)).toBeLessThanOrEqual(1);
 });
 
-test("dot field footprint narrows into rounded ends", async ({ page }) => {
+test("dot field scales the oval footprint beyond the lower viewport", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/ripple");
 
@@ -51,31 +51,36 @@ test("dot field footprint narrows into rounded ends", async ({ page }) => {
     const canvasElement = element instanceof HTMLCanvasElement ? element : null;
     const context = canvasElement?.getContext("2d");
     if (canvasElement === null || context === undefined || context === null) {
-      return { far: 0, middle: 0, near: 0 };
+      return { far: 0, lower: 0, middle: 0, near: 0, viewport: 0 };
     }
 
     const rect = canvasElement.getBoundingClientRect();
     const dpr = canvasElement.width / rect.width;
     const rowWidth = (ratio) => {
-      const row = Math.round(rect.height * ratio * dpr);
-      const data = context.getImageData(0, row, canvasElement.width, 1).data;
-      let minX = canvasElement.width;
-      let maxX = 0;
-      for (let x = 0; x < canvasElement.width; x += 1) {
-        const index = x * 4;
-        if (data[index] + data[index + 1] + data[index + 2] > 80) {
-          minX = Math.min(minX, x);
-          maxX = Math.max(maxX, x);
+      let widest = 0;
+      for (let offset = -14; offset <= 14; offset += 2) {
+        const row = Math.round((rect.height * ratio + offset) * dpr);
+        const data = context.getImageData(0, row, canvasElement.width, 1).data;
+        let minX = canvasElement.width;
+        let maxX = 0;
+        for (let x = 0; x < canvasElement.width; x += 1) {
+          const index = x * 4;
+          if (data[index] + data[index + 1] + data[index + 2] > 80) {
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+          }
         }
+        widest = Math.max(widest, (maxX - minX) / dpr);
       }
-      return (maxX - minX) / dpr;
+      return widest;
     };
 
-    return { far: rowWidth(0.34), middle: rowWidth(0.66), near: rowWidth(0.9) };
+    return { far: rowWidth(0.34), lower: rowWidth(0.82), middle: rowWidth(0.66), near: rowWidth(0.9), viewport: rect.width };
   });
 
   expect(widths.far).toBeLessThan(widths.middle * 0.5);
-  expect(widths.near).toBeLessThan(widths.middle * 0.75);
+  expect(widths.lower).toBeGreaterThan(widths.viewport * 0.98);
+  expect(widths.near).toBeGreaterThan(widths.viewport * 0.98);
 });
 
 test("ripple route stays full-screen on mobile without BPCO layers", async ({ page }) => {
