@@ -38,6 +38,46 @@ test("intro drop lands on the same point where the first ripple starts", async (
   expect(Math.abs(timing.dropY - timing.rippleY)).toBeLessThanOrEqual(1);
 });
 
+test("dot field footprint narrows into rounded ends", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/ripple");
+
+  const canvas = page.getByTestId("ripple-motion-canvas");
+  await expect(canvas).toBeVisible();
+  await expect(canvas).toHaveAttribute("data-motion-state", "interactive", { timeout: 15_000 });
+  await page.waitForTimeout(450);
+
+  const widths = await canvas.evaluate((element) => {
+    const canvasElement = element instanceof HTMLCanvasElement ? element : null;
+    const context = canvasElement?.getContext("2d");
+    if (canvasElement === null || context === undefined || context === null) {
+      return { far: 0, middle: 0, near: 0 };
+    }
+
+    const rect = canvasElement.getBoundingClientRect();
+    const dpr = canvasElement.width / rect.width;
+    const rowWidth = (ratio) => {
+      const row = Math.round(rect.height * ratio * dpr);
+      const data = context.getImageData(0, row, canvasElement.width, 1).data;
+      let minX = canvasElement.width;
+      let maxX = 0;
+      for (let x = 0; x < canvasElement.width; x += 1) {
+        const index = x * 4;
+        if (data[index] + data[index + 1] + data[index + 2] > 80) {
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+        }
+      }
+      return (maxX - minX) / dpr;
+    };
+
+    return { far: rowWidth(0.34), middle: rowWidth(0.66), near: rowWidth(0.9) };
+  });
+
+  expect(widths.far).toBeLessThan(widths.middle * 0.5);
+  expect(widths.near).toBeLessThan(widths.middle * 0.75);
+});
+
 test("ripple route stays full-screen on mobile without BPCO layers", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/ripple");

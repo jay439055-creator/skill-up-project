@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from "react";
 const INTRO_MS = 3200;
 const DPR_LIMIT = 2;
 const POINTER_SETTLE_MS = 1900;
-const GRID_COLUMNS = 78;
-const GRID_ROWS = 48;
+const GRID_COLUMNS = 78, GRID_ROWS = 48;
 const DROP_START_PROGRESS = 0.58;
 const DROP_IMPACT_PROGRESS = 0.88;
 const RIPPLE_ORIGIN_Z = 0.43;
@@ -49,10 +48,12 @@ function createDots(): Dot[] {
   const dots: Dot[] = [];
 
   for (let row = 0; row < GRID_ROWS; row += 1) {
-    const z = row / (GRID_ROWS - 1);
-    for (let column = 0; column < GRID_COLUMNS; column += 1) {
+    const z = (row + 0.5) / GRID_ROWS;
+    const rowWidth = Math.sqrt(Math.max(1 - (z * 2 - 1) ** 2, 0));
+    const columnsInRow = Math.max(5, Math.round(GRID_COLUMNS * rowWidth));
+    for (let column = 0; column < columnsInRow; column += 1) {
       dots.push({
-        x: column / (GRID_COLUMNS - 1) * 2 - 1,
+        x: (column / (columnsInRow - 1) * 2 - 1) * rowWidth,
         z,
         seed: row * GRID_COLUMNS + column,
       });
@@ -87,7 +88,7 @@ function projectDot(dot: Dot, metrics: StageMetrics, lift: number, shimmer: numb
   const x = metrics.centerX + dot.x * metrics.width * 0.46 * scale;
   const y = metrics.horizonY + depth * (metrics.floorY - metrics.horizonY) - lift * (0.28 + dot.z);
   const radius = 0.34 + dot.z * 1.9 + shimmer * 1.55;
-  const alpha = clamp01(0.12 + dot.z * 0.6 + shimmer * 0.76);
+  const alpha = clamp01((0.12 + dot.z * 0.6 + shimmer * 0.76) * Math.sin(Math.PI * dot.z) ** 0.44);
 
   return { alpha, radius, x, y };
 }
