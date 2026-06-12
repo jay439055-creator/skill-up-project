@@ -110,6 +110,18 @@ test("skill up note source stack scales without horizontal overflow on mobile", 
   expect(metrics.overflowX).toBe("hidden");
 });
 
+test("skill up note embeds Vimeo when section 13 play button is clicked", async ({ page }) => {
+  await openSkillUpNote(page);
+  await expect(page.getByTestId("skill-up-note-vimeo-player")).toHaveCount(0);
+
+  await page.getByTestId("skill-up-note-video-trigger").click();
+
+  const player = page.getByTestId("skill-up-note-vimeo-player");
+  await expect(player).toBeVisible();
+  await expect(player).toHaveAttribute("title", "vimeo-player");
+  await expect(player).toHaveAttribute("src", "https://player.vimeo.com/video/1103381792?h=3dec457f5d");
+});
+
 test("adding skill up note preserves existing routes", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByTestId("bpco-page")).toBeVisible();
