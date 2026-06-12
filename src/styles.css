@@ -42,14 +42,11 @@
   width: 1920px;
   height: 1107px;
   overflow: hidden;
-  background:
-    radial-gradient(780px 520px at 1084px 442px, rgb(255 255 255 / 21%), transparent 62%),
-    linear-gradient(90deg, #020202 0 34%, rgb(0 0 0 / 58%) 47%, rgb(0 0 0 / 92%) 100%),
-    #050505;
+  background: #000;
 }
 
 .note-hero::before {
-  content: "";
+  content: none;
   position: absolute;
   top: -18px;
   right: 0;
@@ -66,7 +63,7 @@
 }
 
 .note-hero::after {
-  content: "";
+  content: none;
   position: absolute;
   left: 0;
   bottom: 0;
@@ -77,6 +74,25 @@
     linear-gradient(92deg, rgb(230 230 230 / 80%) 0 19%, rgb(34 34 34 / 80%) 44%, #050505 100%),
     repeating-linear-gradient(8deg, rgb(255 255 255 / 8%) 0 1px, transparent 1px 5px);
   filter: contrast(1.08) grayscale(1);
+}
+
+.note-hero-mockup {
+  position: absolute;
+  top: -37.95px;
+  left: -58.67px;
+  width: 2036px;
+  height: 1182.53px;
+  max-width: none;
+  object-fit: cover;
+}
+
+.note-hero-logo {
+  position: absolute;
+  top: 373.33px;
+  left: 81.33px;
+  width: 282.088px;
+  height: 121.334px;
+  max-width: none;
 }
 
 .note-device {
@@ -247,7 +263,7 @@
 
 .note-hero-subtitle {
   position: absolute;
-  top: 510px;
+  top: 510.67px;
   left: 80px;
   color: rgb(255 255 255 / 70%);
   font-size: 26.667px;
@@ -267,19 +283,15 @@
 
 .note-question-image {
   position: absolute;
-  inset: -156px -100px;
-  background:
-    linear-gradient(90deg, rgb(197 196 228 / 12%), rgb(197 196 228 / 12%)),
-    linear-gradient(180deg, rgb(42 40 40 / 90%) 15%, rgb(39 39 39 / 50%) 100%),
-    radial-gradient(540px 360px at 79% 17%, #020202 0 38%, transparent 39%),
-    radial-gradient(520px 270px at 44% 31%, rgb(255 255 255 / 19%), transparent 66%),
-    radial-gradient(420px 250px at 11% 76%, rgb(255 255 255 / 14%), transparent 64%),
-    linear-gradient(170deg, #111 0 26%, #4d4d4d 45%, #090909 76%);
-  filter: grayscale(1) saturate(0.72) contrast(1.08);
+  top: -156px;
+  left: -100px;
+  width: 2120px;
+  height: 894px;
+  overflow: hidden;
 }
 
 .note-question-image::before {
-  content: "";
+  content: none;
   position: absolute;
   top: 238px;
   left: 230px;
@@ -297,7 +309,7 @@
 }
 
 .note-question-image::after {
-  content: "";
+  content: none;
   position: absolute;
   left: 0;
   right: 0;
@@ -306,6 +318,30 @@
   background:
     radial-gradient(360px 110px at 59% 6%, rgb(255 255 255 / 18%), transparent 68%),
     linear-gradient(180deg, rgb(0 0 0 / 12%), rgb(0 0 0 / 76%));
+}
+
+.note-question-photo {
+  position: absolute;
+  top: -28.62%;
+  left: 0;
+  width: 100%;
+  height: 157.25%;
+  max-width: none;
+  object-fit: cover;
+  opacity: 0.8;
+}
+
+.note-question-overlay {
+  position: absolute;
+  top: -55px;
+  left: 0;
+  width: 1920px;
+  height: 655px;
+  background:
+    linear-gradient(90deg, rgb(49 48 57 / 20%) 0%, rgb(166 160 220 / 20%) 100%),
+    linear-gradient(180deg, rgb(29 29 29 / 20%) 0%, rgb(18 18 18 / 20%) 100%);
+  backdrop-filter: blur(4px);
+  mix-blend-mode: multiply;
 }
 
 .note-question-band h1 {
@@ -570,28 +606,28 @@
   min-height: 360px;
 }
 
-.note-field-section {
+.note-participant-section {
   position: absolute;
-  top: 9729px;
+  top: 6286px;
   left: 0;
   width: 1920px;
-  height: 1015px;
+  height: 721px;
   background:
-    linear-gradient(180deg, rgb(18 18 18 / 10%), #121212),
-    linear-gradient(135deg, #232331, #78799d 52%, #161616);
+    radial-gradient(850px 360px at 50% 64%, rgb(120 121 157 / 22%), transparent 70%),
+    transparent;
 }
 
-.note-field-section .note-kicker {
-  top: 118px;
+.note-participant-section .note-kicker {
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  color: #fff;
+  color: #78799d;
   font-size: 32px;
 }
 
-.note-field-section h2 {
+.note-participant-section h2 {
   position: absolute;
-  top: 246px;
+  top: 108px;
   left: 469px;
   width: 983px;
   color: #fff;
@@ -600,9 +636,12 @@
   text-align: center;
 }
 
+.note-participant-section .note-observation-card {
+  top: 351px;
+}
+
 .note-observation-card {
   position: absolute;
-  top: 512px;
   left: 557px;
   width: 807px;
   min-height: 370px;
@@ -633,9 +672,494 @@
   line-height: 1.45;
 }
 
+.note-bottleneck-section {
+  position: absolute;
+  top: 7287px;
+  left: 0;
+  width: 1920px;
+  height: 1844px;
+  overflow: hidden;
+  background:
+    radial-gradient(1250px 210px at 50% 37%, rgb(120 121 157 / 20%), transparent 72%),
+    transparent;
+}
+
+.note-bottleneck-section > h2:first-child {
+  position: absolute;
+  top: 122px;
+  left: 0;
+  width: 100%;
+  color: #fff;
+  font-size: 34px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.note-bottleneck-list {
+  position: absolute;
+  top: 245px;
+  left: 181px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  width: 1560px;
+}
+
+.note-bottleneck-card {
+  display: grid;
+  place-items: center;
+  width: 455px;
+  height: 455px;
+  padding: 86px 74px 70px;
+  border: 1px solid rgb(197 196 228 / 18%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 42%, rgb(255 255 255 / 5%), transparent 58%),
+    rgb(255 255 255 / 1%);
+  box-shadow: 0 35px 180px rgb(0 0 0 / 30%);
+  text-align: center;
+}
+
+.note-bottleneck-card > span {
+  color: #abaacd;
+  font-size: 36px;
+  line-height: 1;
+}
+
+.note-bottleneck-card h3 {
+  width: 280px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.note-bottleneck-card p {
+  color: rgb(255 255 255 / 62%);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.note-bottleneck-connector {
+  position: absolute;
+  top: 720px;
+  left: 959px;
+  width: 1px;
+  height: 154px;
+  background: linear-gradient(180deg, rgb(171 170 205 / 0%), rgb(171 170 205 / 70%));
+}
+
+.note-bottleneck-connector::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  bottom: -8px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #abaacd;
+  box-shadow: 0 0 32px #abaacd;
+}
+
+.note-bottleneck-question {
+  position: absolute;
+  top: 895px;
+  left: 0;
+  width: 100%;
+  color: #abaacd;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.note-helper-title {
+  position: absolute;
+  top: 1100px;
+  left: 0;
+  width: 100%;
+  color: #fff;
+  font-size: 42px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.note-helper-subtitle {
+  position: absolute;
+  top: 1180px;
+  left: 0;
+  width: 100%;
+  color: rgb(255 255 255 / 54%);
+  font-size: 19px;
+  text-align: center;
+}
+
+.note-helper-grid {
+  position: absolute;
+  top: 1325px;
+  left: 299px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 1320px;
+}
+
+.note-helper-card {
+  height: 446px;
+  border: 1px solid rgb(197 196 228 / 55%);
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 4%), rgb(255 255 255 / 1%)),
+    #151516;
+}
+
+.note-helper-card h3 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  height: 82px;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.note-helper-card h3 span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 6px;
+  background: #c5c4e4;
+  color: #222226;
+  font-size: 17px;
+}
+
+.note-helper-bars {
+  width: 392px;
+  margin: 25px auto 0;
+  padding: 42px 46px;
+  border-radius: 24px;
+  background: rgb(255 255 255 / 8%);
+}
+
+.note-helper-bars div {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 16px;
+  align-items: center;
+  height: 26px;
+}
+
+.note-helper-bars span {
+  color: rgb(255 255 255 / 55%);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.note-helper-bars div::after {
+  content: "";
+  grid-column: 2;
+  grid-row: 1;
+  height: 15px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 14%);
+}
+
+.note-helper-bars i {
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 1;
+  height: 15px;
+  border-radius: 3px;
+  background: #c5c4e4;
+}
+
+.note-helper-card > p {
+  margin: 50px auto 0;
+  width: 520px;
+  color: rgb(255 255 255 / 78%);
+  font-size: 22px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.note-genie-section {
+  position: absolute;
+  top: 14573px;
+  left: 0;
+  width: 1920px;
+  height: 1933px;
+  overflow: hidden;
+  background:
+    radial-gradient(950px 420px at 50% 15%, rgb(171 170 205 / 12%), transparent 78%),
+    linear-gradient(90deg, rgb(18 18 18 / 96%), rgb(18 18 18 / 62%) 50%, rgb(18 18 18 / 96%));
+}
+
+.note-genie-question {
+  position: absolute;
+  top: 0;
+  left: 564px;
+  width: 792px;
+  height: 92px;
+  padding: 20px 40px;
+  border-radius: 0 0 24px 24px;
+  background: #2b2b2f;
+  text-align: center;
+}
+
+.note-genie-question h2 {
+  color: #c5c4e4;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.note-genie-question p {
+  margin-top: 10px;
+  color: rgb(255 255 255 / 66%);
+  font-size: 15px;
+}
+
+.note-genie-grid {
+  position: absolute;
+  top: 165px;
+  left: 450px;
+  display: grid;
+  grid-template-columns: repeat(2, 490px);
+  gap: 34px 36px;
+}
+
+.note-genie-card {
+  height: 490px;
+  padding: 58px 48px;
+  border: 1px solid rgb(197 196 228 / 55%);
+  border-radius: 14px;
+  background: #2a2a2f;
+  box-shadow: 0 28px 130px rgb(0 0 0 / 28%);
+}
+
+.note-genie-card span {
+  display: block;
+  color: #fff;
+  font-size: 24px;
+}
+
+.note-genie-card p {
+  margin-top: 78px;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.note-genie-card small {
+  display: block;
+  margin-top: 86px;
+  color: rgb(255 255 255 / 42%);
+  font-size: 17px;
+}
+
+.note-sticky-note,
+.note-paper-note {
+  position: absolute;
+  border-radius: 16px;
+  box-shadow: 0 25px 70px rgb(0 0 0 / 45%);
+  transform: rotate(-10deg);
+}
+
+.note-sticky-note.one {
+  top: 650px;
+  left: 510px;
+  width: 245px;
+  height: 270px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 28px, rgb(92 82 18 / 16%) 28px 29px),
+    #d7d06c;
+}
+
+.note-sticky-note.two {
+  top: 1230px;
+  left: 1000px;
+  width: 355px;
+  height: 220px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 26px, rgb(50 50 50 / 12%) 26px 27px),
+    #eeeeea;
+  transform: rotate(-5deg);
+}
+
+.note-paper-note {
+  top: 240px;
+  right: -12px;
+  width: 340px;
+  height: 310px;
+  background:
+    radial-gradient(circle at 45% 38%, transparent 0 6px, rgb(0 0 0 / 18%) 7px 8px, transparent 9px),
+    repeating-linear-gradient(12deg, transparent 0 24px, rgb(0 0 0 / 10%) 24px 26px),
+    #d8d8d5;
+  opacity: 0.78;
+  transform: rotate(8deg);
+}
+
+.note-field-section {
+  position: absolute;
+  top: 9729px;
+  left: 0;
+  width: 1920px;
+  height: 1015px;
+  overflow: hidden;
+  background: #121212;
+}
+
+.note-field-photo {
+  position: absolute;
+  top: -214px;
+  left: 0;
+  width: 1920.847px;
+  height: 1183px;
+  max-width: none;
+  object-fit: cover;
+  object-position: bottom center;
+  opacity: 0.3;
+}
+
+.note-field-colorwash {
+  position: absolute;
+  inset: 0;
+  background: #abaacd;
+  mix-blend-mode: multiply;
+}
+
+.note-field-blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 943px;
+  background: rgb(217 217 217 / 0%);
+  backdrop-filter: blur(10px);
+}
+
+.note-field-copy {
+  position: absolute;
+  top: 206px;
+  left: 180px;
+  width: 770px;
+}
+
+.note-field-eyebrow {
+  color: #c5c4e4;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.note-field-copy h2 {
+  margin-top: 70px;
+  color: #fff;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.note-field-copy sup {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(197 196 228 / 78%);
+  color: #121212;
+  font-size: 12px;
+  line-height: 1;
+  vertical-align: super;
+}
+
+.note-field-copy > p:not(.note-field-eyebrow) {
+  margin-top: 34px;
+  color: rgb(255 255 255 / 74%);
+  font-size: 22px;
+  line-height: 1.55;
+}
+
+.note-field-copy ol {
+  display: grid;
+  gap: 14px;
+  margin: 48px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.note-field-copy li {
+  position: relative;
+  padding-left: 36px;
+  color: rgb(255 255 255 / 42%);
+  font-size: 19px;
+  line-height: 1.45;
+}
+
+.note-field-copy li::before {
+  content: counter(list-item);
+  position: absolute;
+  top: 1px;
+  left: 0;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(197 196 228 / 28%);
+  color: rgb(255 255 255 / 76%);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.note-field-meta {
+  position: absolute;
+  top: 322px;
+  left: 1100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 80px;
+  width: 650px;
+  margin: 0;
+}
+
+.note-field-meta div {
+  display: flex;
+  gap: 26px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.note-field-meta div:nth-child(n + 3) {
+  grid-column: 1 / -1;
+}
+
+.note-field-meta dt {
+  margin: 0;
+  color: rgb(255 255 255 / 42%);
+  font-size: 19px;
+  white-space: nowrap;
+}
+
+.note-field-meta dd {
+  margin: 0;
+  color: rgb(255 255 255 / 72%);
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.note-field-meta strong {
+  color: #fff;
+  font-weight: 700;
+}
+
 .note-solution-section {
   position: absolute;
-  top: 9498px;
+  top: 17020px;
   left: 0;
   width: 1920px;
   min-height: 8600px;

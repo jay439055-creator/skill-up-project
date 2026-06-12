@@ -15,6 +15,23 @@ export type TeamAxis = {
   readonly label: string;
 };
 
+export type MeetingBottleneck = {
+  readonly body: string;
+  readonly title: string;
+};
+
+export type MeetingHelper = {
+  readonly body: string;
+  readonly index: string;
+  readonly title: string;
+  readonly values: readonly number[];
+};
+
+export type GenieNeed = {
+  readonly author: string;
+  readonly body: string;
+};
+
 export const meetingStages = [
   {
     body: "문제의 경계 설정, 구성원 간 관계 형성, 초기 긴장 해소",
@@ -52,6 +69,55 @@ export const communicationTracks = [
     title: "과제 트랙",
   },
 ] as const;
+
+export const meetingBottlenecks = [
+  {
+    body: "A 주장을 뒷받침하기 위한 근거를 B 주장에 옮겨 붙여 사용하게 되는 실수를 저지름",
+    title: "주장과 근거 연결의 오류 발생",
+  },
+  {
+    body: "논의의 중심 궤도에서 이탈하여 사소한 부분에 집중을 하다가 본래 목적 및 방향성을 잃음",
+    title: "논의 궤도 이탈로 인해 방향성 잃음",
+  },
+  {
+    body: "유효하다고 판단한 의견이 보류되어 새로운 방향성을 찾기까지 발화 지연이 발생함",
+    title: "재설계 과정에서 발화의 정체 발생",
+  },
+] as const satisfies readonly MeetingBottleneck[];
+
+export const meetingHelpers = [
+  {
+    body: "논의 방향성 조율을 주도하는 역할 뿐 아니라, 사소한 좌절 상황들에서 회복의 동력을 제시함",
+    index: "1",
+    title: "맥락 관리자",
+    values: [86, 36, 72, 10, 18],
+  },
+  {
+    body: "활발한 발언으로 위축된 회의 템포를 살리고 진행이 다시 궤도에 진입하게 유도함",
+    index: "2",
+    title: "적극 발화자",
+    values: [45, 80, 95, 24, 80],
+  },
+] as const satisfies readonly MeetingHelper[];
+
+export const genieNeeds = [
+  {
+    author: "참여자 A",
+    body: "누적된 대화들을 해체하고 분석하여, 지금까지 나오지 않았던 새로운 의견을 제시해주면 좋겠어요.",
+  },
+  {
+    author: "참여자 C",
+    body: "회의의 진행이 어떤 상황, 어떤 발화자가 있어도 매끄러워야 한다고 생각해요.",
+  },
+  {
+    author: "참여자 E",
+    body: "회의를 진행하다가 막혀서 제자리걸음일 때 주제의 전환이 필요해요.",
+  },
+  {
+    author: "참여자 D",
+    body: "50% 부족한 아이디어의 근거 자료를 알려주고, 추가 아이데이션을 구성해주면 편할 것 같아요.",
+  },
+] as const satisfies readonly GenieNeed[];
 
 export const teamAxes = [
   { agile: "대화 중심 회의를 진행하는 조직", classic: "발표 중심 회의를 진행하는 조직", label: "커뮤니케이션 스타일" },
