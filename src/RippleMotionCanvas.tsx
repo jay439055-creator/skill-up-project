@@ -157,9 +157,9 @@ export function RippleMotionCanvas() {
 
     const drawStage = () => {
       const veil = context.createLinearGradient(0, 0, metrics.width, metrics.height);
-      veil.addColorStop(0, "rgb(4 8 13 / 0.1)");
-      veil.addColorStop(0.46, "rgb(2 9 18 / 0.14)");
-      veil.addColorStop(1, "rgb(0 4 9 / 0.28)");
+      veil.addColorStop(0, "rgb(255 255 255 / 0.04)");
+      veil.addColorStop(0.46, "rgb(221 223 249 / 0.06)");
+      veil.addColorStop(1, "rgb(105 132 205 / 0.13)");
       context.fillStyle = veil;
       context.fillRect(0, 0, metrics.width, metrics.height);
     };
