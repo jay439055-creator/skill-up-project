@@ -9,9 +9,17 @@ async function openSkillUpNote(page, viewportSize = { width: 1440, height: 900 }
 test("skill up note lower solution sections use only approved extracted assets", async ({ page }) => {
   await openSkillUpNote(page, { width: 1440, height: 900 });
   await page.waitForFunction(() => {
-    const image = document.querySelector(".note-library-ui-image");
+    const libraryImage = document.querySelector(".note-library-ui-image");
+    const whatIfImage = document.querySelector(".note-whatif-ui-image");
 
-    return image instanceof HTMLImageElement && image.naturalWidth === 1540 && image.naturalHeight === 980;
+    return (
+      libraryImage instanceof HTMLImageElement &&
+      libraryImage.naturalWidth === 1540 &&
+      libraryImage.naturalHeight === 980 &&
+      whatIfImage instanceof HTMLImageElement &&
+      whatIfImage.naturalWidth === 1500 &&
+      whatIfImage.naturalHeight === 820
+    );
   });
 
   const implementation = await page.evaluate(() => {
@@ -23,6 +31,7 @@ test("skill up note lower solution sections use only approved extracted assets",
       "/figma/skill-up-note/hero-macbook-source.png",
       "/figma/skill-up-note/library-history-source.jpg",
       "/figma/skill-up-note/question-photo-source.png",
+      "/figma/skill-up-note/whatif-option-cards-source.jpg",
     ];
     const text = document.body.innerText;
     const lowerSection = document.querySelector(".note-solution-section");
@@ -35,13 +44,12 @@ test("skill up note lower solution sections use only approved extracted assets",
     });
 
     const libraryImage = document.querySelector(".note-library-ui-image");
+    const whatIfImage = document.querySelector(".note-whatif-ui-image");
 
     return {
       allowedImageSources,
       backgroundUrls,
-      buttons: Array.from(document.querySelectorAll(".note-whatif-panel button")).map((button) =>
-        button.textContent?.trim() ?? "",
-      ),
+      buttons: Array.from(document.querySelectorAll(".note-whatif-panel button")).map((button) => button.textContent?.trim() ?? ""),
       embeddedMedia: lowerSection?.querySelectorAll("canvas, iframe, img, svg image, video").length ?? 0,
       domCards: document.querySelectorAll(".note-library-card, .note-branch-card, .note-whatif-card").length,
       whatIfStages: document.querySelectorAll(".note-whatif-stage").length,
@@ -51,6 +59,11 @@ test("skill up note lower solution sections use only approved extracted assets",
         height: libraryImage instanceof HTMLImageElement ? libraryImage.naturalHeight : 0,
         src: libraryImage instanceof HTMLImageElement ? libraryImage.getAttribute("src") ?? "" : "",
         width: libraryImage instanceof HTMLImageElement ? libraryImage.naturalWidth : 0,
+      },
+      whatIfImage: {
+        height: whatIfImage instanceof HTMLImageElement ? whatIfImage.naturalHeight : 0,
+        src: whatIfImage instanceof HTMLImageElement ? whatIfImage.getAttribute("src") ?? "" : "",
+        width: whatIfImage instanceof HTMLImageElement ? whatIfImage.naturalWidth : 0,
       },
       sections: {
         branch: document.querySelectorAll(".note-branch-section").length,
@@ -69,12 +82,17 @@ test("skill up note lower solution sections use only approved extracted assets",
     src: "/figma/skill-up-note/library-history-source.jpg",
     width: 1540,
   });
+  expect(implementation.whatIfImage).toEqual({
+    height: 820,
+    src: "/figma/skill-up-note/whatif-option-cards-source.jpg",
+    width: 1500,
+  });
   expect(implementation.backgroundUrls).toHaveLength(0);
-  expect(implementation.embeddedMedia).toBe(3);
+  expect(implementation.embeddedMedia).toBe(4);
   expect(implementation.sections).toEqual({ branch: 1, final: 1, library: 1, whatIf: 1 });
-  expect(implementation.domCards).toBeGreaterThanOrEqual(3);
+  expect(implementation.domCards).toBe(0);
   expect(implementation.whatIfStages).toBe(2);
-  expect(implementation.buttons).toEqual(["적용 기준 보기", "다시 생성하기", "브랜치에 반영하기"]);
+  expect(implementation.buttons).toEqual([]);
   const normalizedText = implementation.text.replace(/\s+/g, " ");
   expect(normalizedText).toContain("Information Architecture");
   expect(normalizedText).toContain("Library for Retrievable History");
@@ -83,7 +101,6 @@ test("skill up note lower solution sections use only approved extracted assets",
   expect(normalizedText).toContain("1 Context Aware Suggestion");
   expect(normalizedText).toContain("2 Context Aware Suggestion");
   expect(normalizedText).toContain("3 Option Cards");
-  expect(normalizedText).toContain("번거롭다는 인식의 역전");
   expect(normalizedText).toContain("실용 관점에서의 AI 도입");
 });
 
@@ -121,45 +138,40 @@ test("skill up note lower solution panels stay inside the 1920 frame", async ({ 
   }
 });
 
-test("skill up note what-if panel follows the Figma final-card structure", async ({ page }) => {
+test("skill up note what-if panel uses the extracted final-card screen asset", async ({ page }) => {
   await openSkillUpNote(page, { width: 1920, height: 1200 });
   await page.locator(".note-whatif-panel").scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => {
+    const image = document.querySelector(".note-whatif-ui-image");
+
+    return image instanceof HTMLImageElement && image.naturalWidth === 1500 && image.naturalHeight === 820;
+  });
 
   const structure = await page.evaluate(() => {
     const panel = document.querySelector(".note-whatif-panel");
     const rect = panel?.getBoundingClientRect();
-    const cards = Array.from(panel?.querySelectorAll(".note-whatif-card") ?? []).map((card) => {
-      const cardRect = card.getBoundingClientRect();
-
-      return {
-        className: card.className,
-        height: Math.round(cardRect.height),
-        title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() ?? "",
-        width: Math.round(cardRect.width),
-      };
-    });
+    const image = panel?.querySelector(".note-whatif-ui-image");
+    const imageRect = image?.getBoundingClientRect();
 
     return {
       abstractMockups: document.querySelectorAll(".note-context-mockup").length,
       buttons: Array.from(panel?.querySelectorAll("button") ?? []).map((button) => button.textContent?.trim() ?? ""),
-      cardCount: cards.length,
-      cards,
+      cardCount: panel?.querySelectorAll(".note-whatif-card").length ?? 0,
       conditionRows: document.querySelectorAll(".note-condition-row").length,
       branchNodes: document.querySelectorAll(".note-branch-node").length,
+      image: {
+        height: image instanceof HTMLImageElement ? image.naturalHeight : 0,
+        renderedHeight: Math.round(imageRect?.height ?? 0),
+        renderedWidth: Math.round(imageRect?.width ?? 0),
+        src: image instanceof HTMLImageElement ? image.getAttribute("src") ?? "" : "",
+        width: image instanceof HTMLImageElement ? image.naturalWidth : 0,
+      },
       left: Math.round(rect?.left ?? 0),
-      pager: panel?.querySelector(".note-whatif-pager strong")?.textContent?.replace(/\s+/g, " ").trim() ?? "",
       referenceRows: panel?.querySelectorAll(".note-whatif-source-row").length ?? 0,
-      selectedCards: panel?.querySelectorAll(".note-whatif-card.is-selected").length ?? 0,
       suggestionPreviews: document.querySelectorAll(".note-suggestion-preview").length,
       titleLines: Array.from(document.querySelectorAll(".note-whatif-title span")).map((line) => line.textContent?.trim() ?? ""),
       height: Math.round(rect?.height ?? 0),
       width: Math.round(rect?.width ?? 0),
-      overflowingCards: Array.from(panel?.querySelectorAll(".note-whatif-card") ?? []).filter((card) => {
-        const cardRect = card.getBoundingClientRect();
-        const contentRect = card.querySelector(".note-whatif-card-content")?.getBoundingClientRect();
-
-        return contentRect ? contentRect.bottom > cardRect.bottom - 24 : true;
-      }).length,
     };
   });
 
@@ -168,25 +180,17 @@ test("skill up note what-if panel follows the Figma final-card structure", async
   expect(structure.conditionRows).toBeGreaterThanOrEqual(6);
   expect(structure.branchNodes).toBeGreaterThanOrEqual(7);
   expect(structure.titleLines).toEqual(["Tailored Alternative:", "What-if"]);
-  expect(structure.left).toBe(299);
-  expect(structure.width).toBe(1440);
-  expect(structure.height).toBeGreaterThanOrEqual(800);
-  expect(structure.height).toBeLessThanOrEqual(830);
-  expect(structure.buttons).toEqual(["적용 기준 보기", "다시 생성하기", "브랜치에 반영하기"]);
-  expect(structure.pager).toBe("1 / 4");
-  expect(structure.cardCount).toBe(3);
-  expect(structure.selectedCards).toBe(1);
-  expect(structure.referenceRows).toBe(3);
-  expect(structure.overflowingCards).toBe(0);
-  expect(structure.cards.map((card) => card.title)).toEqual([
-    "한번에 스윽 넘기고, 확인하는 보안 만족도",
-    "번거롭다는 인식의 역전, 챗봇 퀴즈로 가벼운 보안 점검",
-    "AI 기반 리디자인 피드백 시스템 도입 가능성",
-  ]);
-
-  for (const card of structure.cards) {
-    expect(card.width).toBeGreaterThanOrEqual(350);
-    expect(card.width).toBeLessThanOrEqual(410);
-    expect(card.height).toBeGreaterThanOrEqual(500);
-  }
+  expect(structure.left).toBe(269);
+  expect(structure.width).toBe(1500);
+  expect(structure.height).toBe(820);
+  expect(structure.buttons).toEqual([]);
+  expect(structure.cardCount).toBe(0);
+  expect(structure.referenceRows).toBe(0);
+  expect(structure.image).toEqual({
+    height: 820,
+    renderedHeight: 820,
+    renderedWidth: 1500,
+    src: "/figma/skill-up-note/whatif-option-cards-source.jpg",
+    width: 1500,
+  });
 });

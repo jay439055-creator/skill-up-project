@@ -165,6 +165,7 @@ test("skill up note does not paste the full Behance board as a screenshot", asyn
       "/figma/skill-up-note/hero-macbook-source.png",
       "/figma/skill-up-note/library-history-source.jpg",
       "/figma/skill-up-note/question-photo-source.png",
+      "/figma/skill-up-note/whatif-option-cards-source.jpg",
     ];
 
     return {

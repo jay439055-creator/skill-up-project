@@ -1,5 +1,3 @@
-import { whatIfCards } from "./skillUpNoteContent";
-
 const conditionColumns = [
   {
     rows: ["현존 커뮤니티 보안에 대한 의견을 묻는 것은 필요", "실용 관점에서의 AI 도입", "대체할 플랫폼과 대비되는 차별점이 묻어나오는 흐름"],
@@ -100,35 +98,12 @@ export function SkillUpNoteWhatIf() {
       </div>
 
       <div className="note-whatif-panel" aria-label="What-if option cards">
-        <button className="note-criteria-button" type="button">적용 기준 보기</button>
-        <div className="note-whatif-board">
-          {whatIfCards.map((card) => (
-            <article className={`note-whatif-card ${card.tone}${card.tone === "featured" ? " is-selected" : ""}`} key={card.title}>
-              <span className="note-card-check" aria-hidden="true" />
-              <span className="note-card-detail">{card.tone === "muted" ? "요약 보기" : "상세 보기"} ›</span>
-              <div className="note-whatif-card-content">
-                <h3>{card.title}</h3>
-                <p>{card.body}</p>
-                <div className="note-whatif-source-list" aria-label="참고한 이전 회의">
-                  {card.sourceItems.map((source) => (
-                    <span className="note-whatif-source-row" key={source}>{source}</span>
-                  ))}
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-        <div className="note-whatif-footer">
-          <div className="note-whatif-pager" aria-label="What-if page">
-            <span>‹</span>
-            <strong>1 / 4</strong>
-            <span>›</span>
-          </div>
-          <div className="note-whatif-actions">
-            <button type="button">다시 생성하기</button>
-            <button type="button" className="is-primary">브랜치에 반영하기</button>
-          </div>
-        </div>
+        <img
+          alt="ELiF What-if option cards screen"
+          className="note-whatif-ui-image"
+          loading="eager"
+          src="/figma/skill-up-note/whatif-option-cards-source.jpg"
+        />
       </div>
     </section>
   );

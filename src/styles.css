@@ -1608,7 +1608,6 @@
 
 .note-library-card h3,
 .note-branch-card h3,
-.note-whatif-card h3,
 .note-whatif-summary h3 {
   margin-top: 22px;
   color: #fff;
@@ -2000,200 +1999,21 @@
 
 .note-whatif-panel {
   position: relative;
-  width: 1440px;
-  height: 816px;
-  margin: 54px 0 0 159px;
+  width: 1500px;
+  height: 820px;
+  margin: 54px 0 0 129px;
   overflow: hidden;
-  border: 2px solid rgb(255 255 255 / 18%);
-  border-radius: 28px;
-  background: #111;
-  box-shadow:
-    inset 0 0 0 6px rgb(255 255 255 / 4%),
-    0 50px 150px rgb(0 0 0 / 42%);
-}
-
-.note-criteria-button {
-  position: absolute;
-  top: 56px;
-  left: 93px;
-  width: 120px;
-  height: 40px;
   border: 0;
-  border-radius: 7px;
-  background: rgb(255 255 255 / 5%);
-  color: rgb(255 255 255 / 68%);
-  font: inherit;
-  font-size: 13px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-.note-whatif-board {
-  position: absolute;
-  top: 144px;
-  left: 93px;
-  display: grid;
-  grid-template-columns: repeat(3, 376px);
-  gap: 40px;
-  height: 529px;
-}
-
-.note-card-check {
-  position: absolute;
-  top: 28px;
-  left: 27px;
-  width: 30px;
-  height: 30px;
-  border: 2px solid rgb(255 255 255 / 42%);
-  border-radius: 50%;
-}
-
-.note-card-check::after {
-  content: "";
-  position: absolute;
-  top: 7px;
-  left: 8px;
-  width: 10px;
-  height: 6px;
-  border-bottom: 2px solid currentcolor;
-  border-left: 2px solid currentcolor;
-  color: rgb(255 255 255 / 72%);
-  transform: rotate(-45deg);
-}
-
-.note-card-detail {
-  position: absolute;
-  top: 33px;
-  right: 33px;
-  color: rgb(255 255 255 / 38%);
-  font-size: 13px;
-}
-
-.note-whatif-footer {
-  position: absolute;
-  right: 94px;
-  bottom: 58px;
-  left: 93px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.note-whatif-pager {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  color: rgb(255 255 255 / 72%);
-}
-
-.note-whatif-pager span {
-  font-size: 34px;
-  line-height: 1;
-}
-
-.note-whatif-pager strong {
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.note-whatif-actions {
-  display: flex;
-  gap: 16px;
-}
-
-.note-whatif-actions button {
-  min-width: 169px;
-  height: 48px;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 9px;
-  background: #1c1c1f;
-  color: rgb(255 255 255 / 74%);
-  font: inherit;
-  font-size: 14px;
-}
-
-.note-whatif-actions button.is-primary {
-  border-color: transparent;
-  background: rgb(255 255 255 / 18%);
-  color: rgb(255 255 255 / 46%);
-}
-
-.note-whatif-card {
-  position: relative;
-  height: 529px;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 26px;
-  background: #151517;
-}
-
-.note-whatif-card.is-selected {
-  border-color: rgb(197 196 228 / 24%);
-  background:
-    radial-gradient(circle at 68% 18%, rgb(125 125 185 / 28%), transparent 38%),
-    linear-gradient(115deg, #151517 0 32%, #22222b 66%, #343451 100%),
-    #23232a;
-  box-shadow:
-    0 0 42px rgb(197 196 228 / 14%),
-    0 48px 140px rgb(0 0 0 / 40%);
-}
-
-.note-whatif-card.muted {
-  background:
-    radial-gradient(circle at 78% 88%, rgb(197 196 228 / 12%), transparent 42%),
-    #16161a;
-}
-
-.note-whatif-card-content {
-  position: absolute;
-  right: 30px;
-  bottom: 50px;
-  left: 30px;
-}
-
-.note-whatif-card.muted .note-whatif-card-content {
-  top: 88px;
-  bottom: 34px;
-}
-
-.note-whatif-card-content h3 {
-  margin: 0;
-  color: rgb(255 255 255 / 82%);
-  font-size: 28px;
-  line-height: 1.38;
-  word-break: keep-all;
-  overflow-wrap: normal;
-}
-
-.note-whatif-card.muted h3 {
-  font-size: 22px;
-  line-height: 1.38;
-}
-
-.note-whatif-card p {
-  margin-top: 26px;
-  color: rgb(255 255 255 / 44%);
-  font-size: 13px;
-  line-height: 1.64;
-  word-break: keep-all;
-}
-
-.note-whatif-card.muted p {
-  font-size: 13px;
-  line-height: 1.58;
-}
-
-.note-whatif-source-list {
-  display: grid;
-  gap: 1px;
-  margin-top: 44px;
-  overflow: hidden;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 4%);
-}
-
-.note-whatif-source-row {
-  padding: 13px 18px;
-  background: rgb(255 255 255 / 3%);
-  color: rgb(255 255 255 / 38%);
-  font-size: 13px;
+.note-whatif-ui-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .note-final-copy {
