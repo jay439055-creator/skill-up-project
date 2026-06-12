@@ -4,7 +4,7 @@ const elifSections = [
   { height: 2092, name: "Elif_03.svg" },
   { height: 2425, name: "Elif_04.svg" },
   { height: 3157, name: "Elif_05.svg" },
-  { height: 1292, name: "Elif_06.svg" },
+  { height: 1292, name: "Elif_06.png" },
   { height: 1926, name: "Elif_07.svg" },
   { height: 1467, name: "Elif_08.svg" },
   { height: 2685, name: "Elif_09.svg" },

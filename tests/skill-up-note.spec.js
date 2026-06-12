@@ -2,8 +2,9 @@ import { expect, test } from "playwright/test";
 
 const expectedSections = Array.from({ length: 17 }, (_, index) => {
   const number = String(index + 1).padStart(2, "0");
+  const extension = number === "06" ? "png" : "svg";
 
-  return `/figma/skill-up-note/elif-source/Elif_${number}.svg`;
+  return `/figma/skill-up-note/elif-source/Elif_${number}.${extension}`;
 });
 
 const expectedHeights = [
@@ -16,7 +17,7 @@ async function openSkillUpNote(page, viewportSize = { width: 1920, height: 1200 
   await expect(page.getByTestId("skill-up-note-page")).toBeVisible();
 }
 
-async function loadAllSvgSections(page) {
+async function loadAllSourceSections(page) {
   await page.evaluate(async () => {
     const documentHeight = document.documentElement.scrollHeight;
 
@@ -31,9 +32,9 @@ async function loadAllSvgSections(page) {
   });
 }
 
-test("skill up note renders the ELiF SVG source files in order", async ({ page }) => {
+test("skill up note renders the ELiF source files in order", async ({ page }) => {
   await openSkillUpNote(page);
-  await loadAllSvgSections(page);
+  await loadAllSourceSections(page);
   await page.waitForFunction(() => {
     const images = Array.from(document.querySelectorAll(".elif-source-section"));
 
@@ -82,7 +83,7 @@ test("skill up note renders the ELiF SVG source files in order", async ({ page }
   }
 });
 
-test("skill up note SVG stack scales without horizontal overflow on mobile", async ({ page }) => {
+test("skill up note source stack scales without horizontal overflow on mobile", async ({ page }) => {
   await openSkillUpNote(page, { width: 390, height: 844 });
   await page.waitForFunction(() => document.querySelectorAll(".elif-source-section").length === 17);
 
