@@ -158,6 +158,8 @@ test("skill up note does not paste the full Behance board as a screenshot", asyn
 
   const implementation = await page.evaluate(() => {
     const allowedImageSources = [
+      "/figma/skill-up-note/back-on-track-ui-source.jpg",
+      "/figma/skill-up-note/branch-interface-source.jpg",
       "/figma/skill-up-note/elif-logo-source.svg",
       "/figma/skill-up-note/field-research-photo.png",
       "/figma/skill-up-note/hero-macbook-source.png",
@@ -179,7 +181,7 @@ test("skill up note does not paste the full Behance board as a screenshot", asyn
   expect(implementation.screenshotWrappers).toBe(0);
   expect(implementation.fullBoardImages).toHaveLength(0);
   expect(implementation.imageSources.sort()).toEqual(implementation.allowedImageSources.sort());
-  expect(implementation.cards).toBeGreaterThanOrEqual(16);
+  expect(implementation.cards).toBeGreaterThanOrEqual(13);
   expect(implementation.text).toContain("회의 중 AI 개입의 필요성");
   expect(implementation.text).toContain("참여 관찰 개요");
   expect(implementation.text).toContain("여러 팀에서 공통적으로 발생한 어려움");

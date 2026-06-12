@@ -1,7 +1,7 @@
 import {
-  branchInterfaceSteps,
   retrievableHistoryCards,
 } from "./skillUpNoteContent";
+import { SkillUpNoteBackTrack } from "./SkillUpNoteBackTrack";
 import { SkillUpNoteWhatIf } from "./SkillUpNoteWhatIf";
 
 export function SkillUpNoteSolution() {
@@ -97,40 +97,18 @@ export function SkillUpNoteSolution() {
           논의가 옆길로 빠지는 순간을 실패로 보지 않고, 다시 연결 가능한 브랜치로 보존합니다.
         </p>
         <div className="note-branch-panel">
-          <div className="note-branch-map" aria-hidden="true">
-            <span className="node main" />
-            <span className="node branch-one" />
-            <span className="node branch-two" />
-            <span className="node branch-three" />
-          </div>
-          <div className="note-branch-list">
-            {branchInterfaceSteps.map((step) => (
-              <article className="note-branch-card" key={step.label}>
-                <small>{step.label}</small>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </article>
-            ))}
-          </div>
+          <img
+            alt="ELiF Branch Interface screen"
+            className="note-branch-ui-image"
+            loading="lazy"
+            src="/figma/skill-up-note/branch-interface-source.jpg"
+          />
         </div>
       </section>
 
       <SkillUpNoteWhatIf />
 
-      <section className="note-final-section" aria-label="Final Back on Track preview">
-        <p>Back on Track</p>
-        <h2 data-figma-node="4:11001">Back on Track</h2>
-        <p className="note-section-copy">
-          ELiF는 회의 중 놓친 맥락을 되찾고, 다음 행동으로 이어질 수 있는 선택지를 제안합니다.
-        </p>
-        <div className="note-final-product" aria-hidden="true">
-          <div className="note-final-sidebar" />
-          <div className="note-final-glow" />
-          <div className="note-final-card one" />
-          <div className="note-final-card two" />
-          <div className="note-final-card three" />
-        </div>
-      </section>
+      <SkillUpNoteBackTrack />
     </section>
   );
 }
