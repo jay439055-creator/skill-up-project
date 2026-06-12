@@ -45,13 +45,13 @@ const videoTriggerStyle = {
 } satisfies CSSProperties;
 
 const videoEmbedStyle = {
-  aspectRatio: "16 / 9",
   background: "#000",
-  left: "31.041667%",
+  bottom: 0,
+  left: 0,
   lineHeight: 0,
   position: "absolute",
-  top: "31.944444%",
-  width: "33.333333%",
+  right: 0,
+  top: 0,
   zIndex: 3,
 } satisfies CSSProperties;
 

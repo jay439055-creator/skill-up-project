@@ -120,6 +120,37 @@ test("skill up note embeds Vimeo when section 13 play button is clicked", async 
   await expect(player).toBeVisible();
   await expect(player).toHaveAttribute("title", "vimeo-player");
   await expect(player).toHaveAttribute("src", "https://player.vimeo.com/video/1103381792?h=3dec457f5d");
+
+  const metrics = await page.evaluate(() => {
+    const section = document.querySelector("[data-elif-layer='13']");
+    const embed = document.querySelector("[data-testid='skill-up-note-video-embed']");
+    const iframe = document.querySelector("[data-testid='skill-up-note-vimeo-player']");
+    const sectionRect = section?.getBoundingClientRect();
+    const embedRect = embed?.getBoundingClientRect();
+    const iframeRect = iframe?.getBoundingClientRect();
+
+    return {
+      embedHeight: Math.round(embedRect?.height ?? 0),
+      embedLeft: Math.round((embedRect?.left ?? 0) - (sectionRect?.left ?? 0)),
+      embedTop: Math.round((embedRect?.top ?? 0) - (sectionRect?.top ?? 0)),
+      embedWidth: Math.round(embedRect?.width ?? 0),
+      iframeHeight: Math.round(iframeRect?.height ?? 0),
+      iframeWidth: Math.round(iframeRect?.width ?? 0),
+      sectionHeight: Math.round(sectionRect?.height ?? 0),
+      sectionWidth: Math.round(sectionRect?.width ?? 0),
+    };
+  });
+
+  expect(metrics).toEqual({
+    embedHeight: 1080,
+    embedLeft: 0,
+    embedTop: 0,
+    embedWidth: 1920,
+    iframeHeight: 1080,
+    iframeWidth: 1920,
+    sectionHeight: 1080,
+    sectionWidth: 1920,
+  });
 });
 
 test("adding skill up note preserves existing routes", async ({ page }) => {
