@@ -1,13 +1,13 @@
 import {
   communicationTracks,
   genieNeeds,
-  libraryCards,
   meetingBottlenecks,
   meetingHelpers,
   meetingStages,
   noteMembers,
   teamAxes,
 } from "./skillUpNoteContent";
+import { SkillUpNoteSolution } from "./SkillUpNoteSolution";
 
 export function SkillUpNotePage() {
   return (
@@ -212,26 +212,7 @@ export function SkillUpNotePage() {
           </dl>
         </section>
 
-        <section className="note-solution-section" aria-label="Back on Track solution">
-          <h2 data-figma-node="4:11001">Back on Track</h2>
-          <div className="note-product-shot" aria-hidden="true">
-            <div className="note-sidebar" />
-            <div className="note-product-canvas">
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
-          <div className="note-library" aria-label="Library cards">
-            <p>Library</p>
-            <h3>팀의 회의 맥락을 구조화하는 실시간 라이브러리</h3>
-            <div>
-              {libraryCards.map((card) => (
-                <span key={card}>{card}</span>
-              ))}
-            </div>
-          </div>
-        </section>
+        <SkillUpNoteSolution />
 
         <footer className="note-footer" aria-label="Project credits">
           <p data-figma-node="4:11005">2025 UXUI Project</p>

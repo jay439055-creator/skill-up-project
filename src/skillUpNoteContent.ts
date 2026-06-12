@@ -32,6 +32,24 @@ export type GenieNeed = {
   readonly body: string;
 };
 
+export type RetrievableHistoryCard = {
+  readonly items: readonly string[];
+  readonly meta: string;
+  readonly title: string;
+};
+
+export type BranchInterfaceStep = {
+  readonly body: string;
+  readonly label: string;
+  readonly title: string;
+};
+
+export type WhatIfCard = {
+  readonly body: string;
+  readonly tone: "default" | "featured" | "muted";
+  readonly title: string;
+};
+
 export const meetingStages = [
   {
     body: "문제의 경계 설정, 구성원 간 관계 형성, 초기 긴장 해소",
@@ -142,4 +160,72 @@ export const libraryCards = [
   "Signal dictionary",
   "Discussion cards",
   "Decision trace",
+] as const;
+
+export const retrievableHistoryCards = [
+  {
+    items: ["회의 목표 재정렬", "논의 궤도 이탈 감지", "다음 액션 후보 3개"],
+    meta: "Context 01",
+    title: "흩어진 회의 흐름을 다시 묶는 기록",
+  },
+  {
+    items: ["발화자별 주장", "근거 연결 상태", "보류된 안건"],
+    meta: "Context 02",
+    title: "말 속에 남은 의사결정 단서",
+  },
+  {
+    items: ["재설계 근거", "비슷한 과거 논의", "반복되는 병목"],
+    meta: "Context 03",
+    title: "이전 회의에서 검색되는 힌트",
+  },
+  {
+    items: ["대안 비교", "반영 여부", "팀 합의 변화"],
+    meta: "Context 04",
+    title: "결정 이후의 맥락 추적",
+  },
+] as const satisfies readonly RetrievableHistoryCard[];
+
+export const branchInterfaceSteps = [
+  {
+    body: "현재 논의의 중심 주제를 메인 트랙으로 고정하고, 옆으로 새는 의견을 별도 브랜치로 분리합니다.",
+    label: "Main track",
+    title: "회의 흐름의 기준선",
+  },
+  {
+    body: "보류된 아이디어는 사라지지 않고 연결선 위에 남아, 필요할 때 다시 꺼낼 수 있는 대안이 됩니다.",
+    label: "Branch point",
+    title: "갈라진 맥락의 저장",
+  },
+  {
+    body: "AI가 이전 회의와 현재 발화를 함께 참조해, 지금 회의에서 다시 볼 만한 대안을 제안합니다.",
+    label: "Re-track",
+    title: "다시 본류로 돌아오기",
+  },
+] as const satisfies readonly BranchInterfaceStep[];
+
+export const whatIfCards = [
+  {
+    body: "홈 하단 슬라이드업 카드로 세 가지 보안 만족도 문항을 순서대로 체크하면, 별도 이동 없이 10초 만에 설문이 끝나고 즉시 결과 그래프로 신뢰를 확인할 수 있다. 참여가 가볍고 보상이 즉각적.",
+    title: "한번에 스윽 넘기고, 확인하는 보안 만족도",
+    tone: "default",
+  },
+  {
+    body: "알림으로 호출된 DM 챗봇이 재미있는 밈과 스티커를 보여주며 ‘우리 앱 보안 만족?’ 등 세 가지 예·아니오 질문을 던지고, 답변마다 맞춤 스티커·즉시 피드백을 제공.",
+    title: "번거롭다는 인식의 역전, 챗봇 퀴즈로 가벼운 보안 점검",
+    tone: "featured",
+  },
+  {
+    body: "사용자가 이해되지 않는 지점에 질문을 남기면, AI가 해당 UI 흐름을 간결하게 리디자인하여 제시합니다. 반복 피드백 없이도 사용자 중심 개선이 실시간으로 이뤄집니다.",
+    title: "AI 기반 리디자인 피드백 시스템 도입 가능성",
+    tone: "muted",
+  },
+] as const satisfies readonly WhatIfCard[];
+
+export const whatIfMeetingSources = [
+  "실용 관점에서의 AI 도입",
+  "디자인 관리자 관점에서의 AI 도입",
+  "기획 관점에서의 AI 도입",
+  "캠퍼스별 보안 지수 위젯 구조",
+  "랭킹 경쟁 심리 활용 인센티브 전략",
+  "교재쿠폰 배지 리워드 배분 로직",
 ] as const;

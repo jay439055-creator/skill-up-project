@@ -165,7 +165,9 @@ test("skill up note does not paste the full Behance board as a screenshot", asyn
     ];
 
     return {
-      cards: document.querySelectorAll(".note-stage-card, .note-track-card, .note-team-row, .note-observation-card, .note-library span").length,
+      cards: document.querySelectorAll(
+        ".note-stage-card, .note-track-card, .note-team-row, .note-observation-card, .note-library-card, .note-branch-card, .note-whatif-card",
+      ).length,
       fullBoardImages: Array.from(document.images).filter((image) => image.naturalHeight > 10_000 || /behance|final|최종/i.test(image.src)),
       imageSources: Array.from(document.images).map((image) => new URL(image.src).pathname),
       screenshotWrappers: document.querySelectorAll("[data-testid='skill-up-note-screenshot-wrapper']").length,
