@@ -11,6 +11,11 @@ const expectedHeights = [
   1107, 545, 2092, 2425, 3157, 1292, 1926, 1467, 2685, 1859, 1410, 1162, 1080, 2036, 2365, 1984, 2332,
 ];
 
+const expectedLoopVideoSources = [
+  "https://player.vimeo.com/video/1103396422?h=48eb0b585f&autoplay=1&muted=1&loop=1&background=1&autopause=0&controls=0",
+  "https://player.vimeo.com/video/1103403283?h=08073889ad&autoplay=1&muted=1&loop=1&background=1&autopause=0&controls=0",
+];
+
 async function openSkillUpNote(page, viewportSize = { width: 1920, height: 1200 }) {
   await page.setViewportSize(viewportSize);
   await page.goto("/skill-up-note");
@@ -44,6 +49,17 @@ test("skill up note renders the ELiF source files in order", async ({ page }) =>
   const metrics = await page.evaluate(() => {
     const frame = document.querySelector("[data-testid='skill-up-note-frame']");
     const frameRect = frame?.getBoundingClientRect();
+    const stackOrder = Array.from(frame?.children ?? []).map((element) => {
+      if (element instanceof HTMLElement && element.dataset["elifLayer"]) {
+        return `image-${element.dataset["elifLayer"]}`;
+      }
+
+      if (element instanceof HTMLElement && element.dataset["loopVideoIndex"]) {
+        return `loop-video-${element.dataset["loopVideoIndex"]}`;
+      }
+
+      return "unknown";
+    });
     const images = Array.from(document.querySelectorAll(".elif-source-section")).map((element) => {
       const image = element instanceof HTMLImageElement ? element : null;
       const rect = image?.getBoundingClientRect();
@@ -63,16 +79,22 @@ test("skill up note renders the ELiF source files in order", async ({ page }) =>
       frameWidth: Math.round(frameRect?.width ?? 0),
       imageSources: images.map((image) => image.source),
       images,
+      loopVideoSources: Array.from(document.querySelectorAll("[data-testid='skill-up-note-loop-video-player']")).map((element) =>
+        element.getAttribute("src") ?? "",
+      ),
       oldSections: document.querySelectorAll(".note-hero, .note-solution-section, .note-whatif-section, .note-final-section").length,
       screenshotWrappers: document.querySelectorAll("[data-testid='skill-up-note-screenshot-wrapper']").length,
+      stackOrder,
     };
   });
 
   expect(metrics.frameWidth).toBe(1920);
-  expect(metrics.frameHeight).toBe(30_924);
+  expect(metrics.frameHeight).toBe(33_084);
   expect(metrics.imageSources).toEqual(expectedSections);
+  expect(metrics.loopVideoSources).toEqual(expectedLoopVideoSources);
   expect(metrics.oldSections).toBe(0);
   expect(metrics.screenshotWrappers).toBe(0);
+  expect(metrics.stackOrder.slice(15)).toEqual(["image-16", "loop-video-1", "loop-video-2", "image-17"]);
 
   for (const [index, image] of metrics.images.entries()) {
     expect(image.index).toBe(String(index + 1));
@@ -81,6 +103,53 @@ test("skill up note renders the ELiF source files in order", async ({ page }) =>
     expect(image.renderedWidth).toBe(1920);
     expect(image.renderedHeight).toBe(expectedHeights[index]);
   }
+});
+
+test("skill up note loops two Vimeo embeds between sections 16 and 17", async ({ page }) => {
+  await openSkillUpNote(page);
+  await expect(page.getByTestId("skill-up-note-loop-video-player")).toHaveCount(2);
+
+  const metrics = await page.evaluate(() => {
+    const videos = Array.from(document.querySelectorAll("[data-testid='skill-up-note-loop-video']")).map((element) => {
+      const wrapper = element instanceof HTMLElement ? element : null;
+      const frame = wrapper?.querySelector("iframe");
+      const wrapperRect = wrapper?.getBoundingClientRect();
+      const frameRect = frame?.getBoundingClientRect();
+
+      return {
+        allow: frame?.getAttribute("allow") ?? "",
+        frameHeight: Math.round(frameRect?.height ?? 0),
+        frameWidth: Math.round(frameRect?.width ?? 0),
+        index: wrapper?.dataset["loopVideoIndex"] ?? "",
+        source: frame?.getAttribute("src") ?? "",
+        wrapperHeight: Math.round(wrapperRect?.height ?? 0),
+        wrapperWidth: Math.round(wrapperRect?.width ?? 0),
+      };
+    });
+
+    return { videos };
+  });
+
+  expect(metrics.videos).toEqual([
+    {
+      allow: "autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share",
+      frameHeight: 1080,
+      frameWidth: 1920,
+      index: "1",
+      source: expectedLoopVideoSources[0],
+      wrapperHeight: 1080,
+      wrapperWidth: 1920,
+    },
+    {
+      allow: "autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share",
+      frameHeight: 1080,
+      frameWidth: 1920,
+      index: "2",
+      source: expectedLoopVideoSources[1],
+      wrapperHeight: 1080,
+      wrapperWidth: 1920,
+    },
+  ]);
 });
 
 test("skill up note source stack scales without horizontal overflow on mobile", async ({ page }) => {

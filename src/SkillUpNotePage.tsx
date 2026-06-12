@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import type { CSSProperties } from "react";
 
 const elifSections = [
@@ -22,6 +22,10 @@ const elifSections = [
 ] as const;
 
 const vimeoSource = "https://player.vimeo.com/video/1103381792?h=3dec457f5d";
+const loopingVimeoSources = [
+  "https://player.vimeo.com/video/1103396422?h=48eb0b585f&autoplay=1&muted=1&loop=1&background=1&autopause=0&controls=0",
+  "https://player.vimeo.com/video/1103403283?h=08073889ad&autoplay=1&muted=1&loop=1&background=1&autopause=0&controls=0",
+] as const;
 
 const sourceLayerStyle = {
   display: "block",
@@ -55,6 +59,14 @@ const videoEmbedStyle = {
   zIndex: 3,
 } satisfies CSSProperties;
 
+const loopVideoLayerStyle = {
+  aspectRatio: "16 / 9",
+  background: "#000",
+  display: "block",
+  lineHeight: 0,
+  position: "relative",
+} satisfies CSSProperties;
+
 const vimeoFrameStyle = {
   border: 0,
   display: "block",
@@ -70,46 +82,72 @@ export function SkillUpNotePage() {
       <div className="skill-up-note-frame elif-source-stack" data-testid="skill-up-note-frame" aria-label="ELiF source stack">
         {elifSections.map((section, index) => {
           const isVideoSection = section.name === "Elif_13.svg";
+          const shouldRenderLoopVideosAfter = section.name === "Elif_16.svg";
 
           return (
-            <div data-elif-layer={index + 1} key={section.name} style={sourceLayerStyle}>
-              <img
-                alt=""
-                aria-hidden="true"
-                className="elif-source-section"
-                data-elif-index={index + 1}
-                data-elif-source={section.name}
-                height={section.height}
-                loading={index < 3 ? "eager" : "lazy"}
-                src={`/figma/skill-up-note/elif-source/${section.name}`}
-                width={1920}
-              />
-              {isVideoSection && !isVideoEmbedded ? (
-                <button
-                  aria-label="Vimeo 영상 재생"
-                  data-testid="skill-up-note-video-trigger"
-                  onClick={() => setIsVideoEmbedded(true)}
-                  style={videoTriggerStyle}
-                  type="button"
+            <Fragment key={section.name}>
+              <div data-elif-layer={index + 1} style={sourceLayerStyle}>
+                <img
+                  alt=""
+                  aria-hidden="true"
+                  className="elif-source-section"
+                  data-elif-index={index + 1}
+                  data-elif-source={section.name}
+                  height={section.height}
+                  loading={index < 3 ? "eager" : "lazy"}
+                  src={`/figma/skill-up-note/elif-source/${section.name}`}
+                  width={1920}
                 />
-              ) : null}
-              {isVideoSection && isVideoEmbedded ? (
-                <div data-testid="skill-up-note-video-embed" style={videoEmbedStyle}>
-                  <iframe
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                    allowFullScreen
-                    data-testid="skill-up-note-vimeo-player"
-                    frameBorder="0"
-                    height="360"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    src={vimeoSource}
-                    style={vimeoFrameStyle}
-                    title="vimeo-player"
-                    width="640"
+                {isVideoSection && !isVideoEmbedded ? (
+                  <button
+                    aria-label="Vimeo 영상 재생"
+                    data-testid="skill-up-note-video-trigger"
+                    onClick={() => setIsVideoEmbedded(true)}
+                    style={videoTriggerStyle}
+                    type="button"
                   />
-                </div>
-              ) : null}
-            </div>
+                ) : null}
+                {isVideoSection && isVideoEmbedded ? (
+                  <div data-testid="skill-up-note-video-embed" style={videoEmbedStyle}>
+                    <iframe
+                      allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                      allowFullScreen
+                      data-testid="skill-up-note-vimeo-player"
+                      frameBorder="0"
+                      height="360"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      src={vimeoSource}
+                      style={vimeoFrameStyle}
+                      title="vimeo-player"
+                      width="640"
+                    />
+                  </div>
+                ) : null}
+              </div>
+              {shouldRenderLoopVideosAfter
+                ? loopingVimeoSources.map((source, videoIndex) => (
+                    <div
+                      data-loop-video-index={videoIndex + 1}
+                      data-testid="skill-up-note-loop-video"
+                      key={source}
+                      style={loopVideoLayerStyle}
+                    >
+                      <iframe
+                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                        allowFullScreen
+                        data-testid="skill-up-note-loop-video-player"
+                        frameBorder="0"
+                        height="360"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        src={source}
+                        style={vimeoFrameStyle}
+                        title="vimeo-player"
+                        width="640"
+                      />
+                    </div>
+                  ))
+                : null}
+            </Fragment>
           );
         })}
       </div>
