@@ -1,0 +1,237 @@
+import { expect, test } from "playwright/test";
+
+const expectedSections = Array.from({ length: 17 }, (_, index) => {
+  const number = String(index + 1).padStart(2, "0");
+  const extension = number === "06" ? "png" : "svg";
+
+  return `/figma/skill-up-note/elif-source/Elif_${number}.${extension}`;
+});
+
+const expectedHeights = [
+  1107, 545, 2092, 2425, 3157, 1292, 1926, 1467, 2685, 1859, 1410, 1162, 1080, 2036, 2365, 1984, 2332,
+];
+
+const expectedLoopVideoSources = [
+  "https://player.vimeo.com/video/1103396422?h=48eb0b585f&autoplay=1&muted=1&loop=1&background=1&autopause=0&controls=0",
+  "https://player.vimeo.com/video/1103403283?h=08073889ad&autoplay=1&muted=1&loop=1&background=1&autopause=0&controls=0",
+];
+
+async function openSkillUpNote(page, viewportSize = { width: 1920, height: 1200 }) {
+  await page.setViewportSize(viewportSize);
+  await page.goto("/skill-up-note");
+  await expect(page.getByTestId("skill-up-note-page")).toBeVisible();
+}
+
+async function loadAllSourceSections(page) {
+  await page.evaluate(async () => {
+    const documentHeight = document.documentElement.scrollHeight;
+
+    for (let y = 0; y <= documentHeight; y += 1200) {
+      window.scrollTo(0, y);
+      await new Promise((resolve) => {
+        window.setTimeout(resolve, 30);
+      });
+    }
+
+    window.scrollTo(0, 0);
+  });
+}
+
+test("skill up note renders the ELiF source files in order", async ({ page }) => {
+  await openSkillUpNote(page);
+  await loadAllSourceSections(page);
+  await page.waitForFunction(() => {
+    const images = Array.from(document.querySelectorAll(".elif-source-section"));
+
+    return images.length === 17 && images.every((element) => element instanceof HTMLImageElement && element.naturalWidth === 1920);
+  });
+
+  const metrics = await page.evaluate(() => {
+    const frame = document.querySelector("[data-testid='skill-up-note-frame']");
+    const frameRect = frame?.getBoundingClientRect();
+    const stackOrder = Array.from(frame?.children ?? []).map((element) => {
+      if (element instanceof HTMLElement && element.dataset["elifLayer"]) {
+        return `image-${element.dataset["elifLayer"]}`;
+      }
+
+      if (element instanceof HTMLElement && element.dataset["loopVideoIndex"]) {
+        return `loop-video-${element.dataset["loopVideoIndex"]}`;
+      }
+
+      return "unknown";
+    });
+    const images = Array.from(document.querySelectorAll(".elif-source-section")).map((element) => {
+      const image = element instanceof HTMLImageElement ? element : null;
+      const rect = image?.getBoundingClientRect();
+
+      return {
+        index: image?.dataset["elifIndex"] ?? "",
+        naturalHeight: image?.naturalHeight ?? 0,
+        naturalWidth: image?.naturalWidth ?? 0,
+        renderedHeight: Math.round(rect?.height ?? 0),
+        renderedWidth: Math.round(rect?.width ?? 0),
+        source: image ? new URL(image.src).pathname : "",
+      };
+    });
+
+    return {
+      frameHeight: Math.round(frameRect?.height ?? 0),
+      frameWidth: Math.round(frameRect?.width ?? 0),
+      imageSources: images.map((image) => image.source),
+      images,
+      loopVideoSources: Array.from(document.querySelectorAll("[data-testid='skill-up-note-loop-video-player']")).map((element) =>
+        element.getAttribute("src") ?? "",
+      ),
+      oldSections: document.querySelectorAll(".note-hero, .note-solution-section, .note-whatif-section, .note-final-section").length,
+      screenshotWrappers: document.querySelectorAll("[data-testid='skill-up-note-screenshot-wrapper']").length,
+      stackOrder,
+    };
+  });
+
+  expect(metrics.frameWidth).toBe(1920);
+  expect(metrics.frameHeight).toBe(33_084);
+  expect(metrics.imageSources).toEqual(expectedSections);
+  expect(metrics.loopVideoSources).toEqual(expectedLoopVideoSources);
+  expect(metrics.oldSections).toBe(0);
+  expect(metrics.screenshotWrappers).toBe(0);
+  expect(metrics.stackOrder.slice(15)).toEqual(["image-16", "loop-video-1", "loop-video-2", "image-17"]);
+
+  for (const [index, image] of metrics.images.entries()) {
+    expect(image.index).toBe(String(index + 1));
+    expect(image.naturalWidth).toBe(1920);
+    expect(image.naturalHeight).toBe(expectedHeights[index]);
+    expect(image.renderedWidth).toBe(1920);
+    expect(image.renderedHeight).toBe(expectedHeights[index]);
+  }
+});
+
+test("skill up note loops two Vimeo embeds between sections 16 and 17", async ({ page }) => {
+  await openSkillUpNote(page);
+  await expect(page.getByTestId("skill-up-note-loop-video-player")).toHaveCount(2);
+
+  const metrics = await page.evaluate(() => {
+    const videos = Array.from(document.querySelectorAll("[data-testid='skill-up-note-loop-video']")).map((element) => {
+      const wrapper = element instanceof HTMLElement ? element : null;
+      const frame = wrapper?.querySelector("iframe");
+      const wrapperRect = wrapper?.getBoundingClientRect();
+      const frameRect = frame?.getBoundingClientRect();
+
+      return {
+        allow: frame?.getAttribute("allow") ?? "",
+        frameHeight: Math.round(frameRect?.height ?? 0),
+        frameWidth: Math.round(frameRect?.width ?? 0),
+        index: wrapper?.dataset["loopVideoIndex"] ?? "",
+        source: frame?.getAttribute("src") ?? "",
+        wrapperHeight: Math.round(wrapperRect?.height ?? 0),
+        wrapperWidth: Math.round(wrapperRect?.width ?? 0),
+      };
+    });
+
+    return { videos };
+  });
+
+  expect(metrics.videos).toEqual([
+    {
+      allow: "autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share",
+      frameHeight: 1080,
+      frameWidth: 1920,
+      index: "1",
+      source: expectedLoopVideoSources[0],
+      wrapperHeight: 1080,
+      wrapperWidth: 1920,
+    },
+    {
+      allow: "autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share",
+      frameHeight: 1080,
+      frameWidth: 1920,
+      index: "2",
+      source: expectedLoopVideoSources[1],
+      wrapperHeight: 1080,
+      wrapperWidth: 1920,
+    },
+  ]);
+});
+
+test("skill up note source stack scales without horizontal overflow on mobile", async ({ page }) => {
+  await openSkillUpNote(page, { width: 390, height: 844 });
+  await page.waitForFunction(() => document.querySelectorAll(".elif-source-section").length === 17);
+
+  const metrics = await page.evaluate(() => {
+    const frame = document.querySelector("[data-testid='skill-up-note-frame']");
+    const firstImage = document.querySelector(".elif-source-section");
+    const frameRect = frame?.getBoundingClientRect();
+    const firstRect = firstImage?.getBoundingClientRect();
+
+    return {
+      docWidth: document.documentElement.scrollWidth,
+      frameWidth: Math.round(frameRect?.width ?? 0),
+      firstImageWidth: Math.round(firstRect?.width ?? 0),
+      imageCount: document.querySelectorAll(".elif-source-section").length,
+      overflowX: getComputedStyle(document.querySelector("[data-testid='skill-up-note-page']") ?? document.body).overflowX,
+      viewportWidth: window.innerWidth,
+    };
+  });
+
+  expect(metrics.imageCount).toBe(17);
+  expect(metrics.docWidth).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  expect(metrics.frameWidth).toBe(390);
+  expect(metrics.firstImageWidth).toBe(390);
+  expect(metrics.overflowX).toBe("hidden");
+});
+
+test("skill up note embeds Vimeo when section 13 play button is clicked", async ({ page }) => {
+  await openSkillUpNote(page);
+  await expect(page.getByTestId("skill-up-note-vimeo-player")).toHaveCount(0);
+
+  await page.getByTestId("skill-up-note-video-trigger").click();
+
+  const player = page.getByTestId("skill-up-note-vimeo-player");
+  await expect(player).toBeVisible();
+  await expect(player).toHaveAttribute("title", "vimeo-player");
+  await expect(player).toHaveAttribute("src", "https://player.vimeo.com/video/1103381792?h=3dec457f5d");
+
+  const metrics = await page.evaluate(() => {
+    const section = document.querySelector("[data-elif-layer='13']");
+    const embed = document.querySelector("[data-testid='skill-up-note-video-embed']");
+    const iframe = document.querySelector("[data-testid='skill-up-note-vimeo-player']");
+    const sectionRect = section?.getBoundingClientRect();
+    const embedRect = embed?.getBoundingClientRect();
+    const iframeRect = iframe?.getBoundingClientRect();
+
+    return {
+      embedHeight: Math.round(embedRect?.height ?? 0),
+      embedLeft: Math.round((embedRect?.left ?? 0) - (sectionRect?.left ?? 0)),
+      embedTop: Math.round((embedRect?.top ?? 0) - (sectionRect?.top ?? 0)),
+      embedWidth: Math.round(embedRect?.width ?? 0),
+      iframeHeight: Math.round(iframeRect?.height ?? 0),
+      iframeWidth: Math.round(iframeRect?.width ?? 0),
+      sectionHeight: Math.round(sectionRect?.height ?? 0),
+      sectionWidth: Math.round(sectionRect?.width ?? 0),
+    };
+  });
+
+  expect(metrics).toEqual({
+    embedHeight: 1080,
+    embedLeft: 0,
+    embedTop: 0,
+    embedWidth: 1920,
+    iframeHeight: 1080,
+    iframeWidth: 1920,
+    sectionHeight: 1080,
+    sectionWidth: 1920,
+  });
+});
+
+test("adding skill up note preserves existing routes", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("bpco-page")).toBeVisible();
+  await expect(page.getByTestId("skill-up-note-page")).toHaveCount(0);
+
+  await page.goto("/ripple");
+  await expect(page.getByTestId("ripple-experience")).toBeVisible();
+  await expect(page.getByTestId("skill-up-note-page")).toHaveCount(0);
+
+  await page.goto("/not-a-real-page");
+  await expect(page.getByTestId("bpco-page")).toBeVisible();
+  await expect(page.getByTestId("skill-up-note-page")).toHaveCount(0);
+});

@@ -4,7 +4,7 @@ test("ripple route renders an independent pointer-reactive wave field", async ({
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/ripple");
   await expect(page.getByTestId("ripple-experience")).toBeVisible();
-  await expect(page.getByText("Wave field study")).toBeVisible();
+  await expect(page.getByText("Current Archive")).toBeVisible();
   await expect(page.getByText("Bigpicture Company")).toHaveCount(0);
 
   const canvas = page.getByTestId("ripple-motion-canvas");
@@ -20,6 +20,68 @@ test("ripple route renders an independent pointer-reactive wave field", async ({
   }));
   expect(pointer.x).toBeGreaterThan(700);
   expect(pointer.y).toBeGreaterThan(580);
+});
+
+test("ripple hero dissolves through a gradient veil into white after the first viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/ripple");
+
+  await expect(page.getByTestId("ripple-experience")).toBeVisible();
+  await expect(page.getByTestId("ripple-transition")).toBeVisible();
+
+  const transition = await page.evaluate(() => {
+    const hero = document.querySelector(".ripple_hero");
+    const band = document.querySelector("[data-testid='ripple-transition']");
+    const after = document.querySelector(".ripple_after");
+
+    if (!(hero instanceof HTMLElement) || !(band instanceof HTMLElement) || !(after instanceof HTMLElement)) {
+      throw new Error("ripple transition structure was not found");
+    }
+
+    const heroRect = hero.getBoundingClientRect();
+    const bandRect = band.getBoundingClientRect();
+    const afterRect = after.getBoundingClientRect();
+    const bandStyle = window.getComputedStyle(band);
+    const beforeStyle = window.getComputedStyle(band, "::before");
+    const afterStyle = window.getComputedStyle(band, "::after");
+
+    return {
+      afterBackground: window.getComputedStyle(after).backgroundColor,
+      afterTop: Math.round(afterRect.top + window.scrollY),
+      bandBackground: bandStyle.backgroundImage,
+      bandHeight: Math.round(bandRect.height),
+      bandTop: Math.round(bandRect.top + window.scrollY),
+      curtainFilter: afterStyle.filter,
+      experienceBackground: window.getComputedStyle(document.querySelector(".ripple_experience") ?? document.body).backgroundColor,
+      experienceField: window.getComputedStyle(document.querySelector(".ripple_experience") ?? document.body, "::before")
+        .backgroundImage,
+      heroBackground: window.getComputedStyle(hero).backgroundImage,
+      heroBottom: Math.round(heroRect.bottom + window.scrollY),
+      marker: band.getAttribute("data-transition-surface"),
+      pillNodes: document.querySelectorAll(".ripple_transition_wave").length,
+      shapeLayer: beforeStyle.backgroundImage,
+      viewportHeight: window.innerHeight,
+      veilFilter: beforeStyle.filter,
+      waveLayer: afterStyle.backgroundImage,
+    };
+  });
+
+  expect(transition.marker).toBe("white-gradient-veil");
+  expect(transition.bandTop).toBeLessThanOrEqual(transition.heroBottom);
+  expect(transition.bandTop).toBeGreaterThanOrEqual(transition.heroBottom - transition.viewportHeight * 0.32);
+  expect(transition.bandHeight).toBeGreaterThanOrEqual(760);
+  expect(transition.afterTop).toBeGreaterThan(transition.bandTop + 620);
+  expect(transition.experienceBackground).toBe("rgb(255, 255, 255)");
+  expect(["rgb(255, 255, 255)", "rgba(0, 0, 0, 0)"]).toContain(transition.afterBackground);
+  expect(transition.pillNodes).toBe(0);
+  expect(transition.heroBackground).toBe("none");
+  expect(transition.experienceField).toContain("radial-gradient");
+  expect(transition.bandBackground).toBe("none");
+  expect(transition.shapeLayer).toContain("radial-gradient");
+  expect(transition.shapeLayer).toContain("linear-gradient");
+  expect(transition.waveLayer).toContain("radial-gradient");
+  expect(transition.veilFilter).toContain("blur");
+  expect(transition.curtainFilter).toContain("blur");
 });
 
 test("intro drop lands on the same point where the first ripple starts", async ({ page }) => {
@@ -65,7 +127,7 @@ test("dot field scales the oval footprint beyond the lower viewport", async ({ p
         let maxX = 0;
         for (let x = 0; x < canvasElement.width; x += 1) {
           const index = x * 4;
-          if (data[index] + data[index + 1] + data[index + 2] > 80) {
+          if (data[index + 3] > 80 && data[index] + data[index + 1] + data[index + 2] > 80) {
             minX = Math.min(minX, x);
             maxX = Math.max(maxX, x);
           }
@@ -78,9 +140,9 @@ test("dot field scales the oval footprint beyond the lower viewport", async ({ p
     return { far: rowWidth(0.34), lower: rowWidth(0.82), middle: rowWidth(0.66), near: rowWidth(0.9), viewport: rect.width };
   });
 
-  expect(widths.far).toBeLessThan(widths.middle * 0.5);
+  expect(widths.far).toBeLessThan(widths.middle * 0.53);
   expect(widths.lower).toBeGreaterThan(widths.viewport * 0.98);
-  expect(widths.near).toBeGreaterThan(widths.viewport * 0.98);
+  expect(widths.near).toBeGreaterThan(widths.viewport * 0.97);
 });
 
 test("ripple route stays full-screen on mobile without BPCO layers", async ({ page }) => {

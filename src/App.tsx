@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BpcoHeroCanvas } from "./BpcoHeroCanvas";
 import { assets, businessItems, philosophyItems, projectItems } from "./bpcoContent";
 import { RippleExperience } from "./RippleExperience";
+import { SkillUpNotePage } from "./SkillUpNotePage";
 
 const clamp = (value: number, min = 0, max = 1): number => Math.min(Math.max(value, min), max);
 const ledItems = Array.from({ length: 4 }, (_, index) => `led-${index + 1}`);
@@ -227,6 +228,10 @@ function BpcoPage() {
 }
 
 export function App() {
+  if (window.location.pathname === "/skill-up-note") {
+    return <SkillUpNotePage />;
+  }
+
   if (window.location.pathname === "/ripple") {
     return <RippleExperience />;
   }

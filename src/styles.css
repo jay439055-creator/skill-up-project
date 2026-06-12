@@ -729,11 +729,31 @@ footer address {
 }
 
 .ripple_experience {
+  --ripple_light_ink: rgb(28 42 72 / 82%);
+  --ripple_scroll_field:
+    linear-gradient(to bottom, rgb(255 255 255 / 8%) 0%, rgb(255 255 255 / 0%) 100%),
+    radial-gradient(760px 680px at -10% -10%, rgb(249 238 244 / 68%), rgb(224 231 255 / 38%) 50%, transparent 80%),
+    radial-gradient(1120px 820px at 47% 18%, rgb(218 226 255 / 68%), rgb(190 204 250 / 50%) 50%, transparent 82%),
+    radial-gradient(1040px 760px at 78% 18%, rgb(184 200 250 / 96%), rgb(132 160 241 / 72%) 56%, transparent 86%),
+    radial-gradient(1040px 660px at 68% 42%, rgb(92 126 229 / 62%), rgb(116 146 236 / 44%) 58%, transparent 84%),
+    linear-gradient(to bottom, #f8fbff 0%, #f1f5ff 12%, #d4ddff 26%, #9fb5f6 44%, #7895ec 56%, #9fb6f6 68%, #dce7ff 84%, #fff 100%);
+
   position: relative;
   min-height: 200vh;
   overflow-x: hidden;
-  background: linear-gradient(to bottom, #f8fbff 0%, #eef3ff 28%, #fff 62%);
+  background: #fff;
   color: #142a3d;
+  isolation: isolate;
+}
+
+.ripple_experience::before {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 0;
+  height: 200vh;
+  background: var(--ripple_scroll_field);
+  content: "";
+  pointer-events: none;
 }
 
 .ripple_hero {
@@ -749,8 +769,8 @@ footer address {
   z-index: 2;
   min-height: 100vh;
   min-height: 100svh;
-  overflow: hidden;
-  background: var(--ripple_hero_field);
+  overflow: visible;
+  background: transparent;
   color: #e7f6ff;
   isolation: isolate;
 }
@@ -770,6 +790,24 @@ footer address {
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 62%, transparent 94%);
   mask-image: linear-gradient(to bottom, #000 0%, #000 62%, transparent 94%);
   opacity: 0.9;
+  pointer-events: none;
+}
+
+.ripple_hero::after {
+  position: absolute;
+  right: 0;
+  bottom: -28vh;
+  left: 0;
+  z-index: 3;
+  height: 64vh;
+  background:
+    linear-gradient(to bottom, rgb(120 149 236 / 0%) 0%, rgb(126 154 238 / 58%) 22%, rgb(126 154 238 / 100%) 42%, rgb(132 159 239 / 100%) 62%, rgb(132 159 239 / 64%) 82%, rgb(132 159 239 / 0%) 100%),
+    radial-gradient(118% 54% at 28% 54%, rgb(255 255 255 / 12%), transparent 76%),
+    radial-gradient(94% 48% at 74% 58%, rgb(232 240 255 / 12%), transparent 74%);
+  content: "";
+  filter: blur(18px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 72%, transparent 100%);
   pointer-events: none;
 }
 
@@ -801,6 +839,9 @@ footer address {
   line-height: 1;
   letter-spacing: -0.04em;
   mix-blend-mode: plus-lighter;
+  transition:
+    color 320ms ease,
+    text-shadow 320ms ease;
 }
 
 .ripple_nav_tabs {
@@ -820,6 +861,16 @@ footer address {
   color: inherit;
   text-decoration: none;
   text-shadow: 0 4px 36px rgb(210 216 236 / 28%);
+}
+
+.ripple_nav.is_on_light {
+  color: var(--ripple_light_ink);
+  mix-blend-mode: normal;
+}
+
+.ripple_nav.is_on_light .ripple_nav_home,
+.ripple_nav.is_on_light .ripple_nav_tabs a {
+  text-shadow: 0 4px 28px rgb(255 255 255 / 46%);
 }
 
 .ripple_frame {
@@ -1202,11 +1253,199 @@ footer address {
 }
 
 .ripple_after {
+  --ripple_about_alpha: 0.08;
+  --ripple_about_blur: 2.4px;
+  --ripple_about_lift: 108px;
+  --ripple_about_word_space: 2.8vw;
+  --ripple_about_line_1: -6.2vw;
+  --ripple_about_line_2: 5.4vw;
+  --ripple_about_line_3: -3.8vw;
+  --ripple_about_line_4: 4.8vw;
+  --ripple_about_line_5: -2.6vw;
+  --ripple_about_line_6: 3.2vw;
+
   position: relative;
   z-index: 1;
-  min-height: 166vh;
-  margin-top: 0;
-  background: #fff;
+  min-height: 120vh;
+  margin-top: -1px;
+  background: transparent;
+}
+
+.ripple_about_intro {
+  width: 100%;
+  padding: clamp(92px, 14vh, 150px) 28px clamp(120px, 18vh, 190px);
+  color: var(--ripple_light_ink);
+}
+
+.ripple_about_kicker {
+  margin: 0 0 26px;
+  font-size: clamp(16px, 1.35vw, 25px);
+  font-weight: 520;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: 0;
+  opacity: var(--ripple_about_alpha);
+  transform: translate3d(0, calc(var(--ripple_about_lift) * 0.38), 0);
+  will-change: opacity, transform;
+}
+
+.ripple_about_intro h2 {
+  margin: 0;
+  width: 100%;
+  color: inherit;
+  font-family: "DM Sans", "Inter", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(44px, 4.82vw, 93px);
+  font-weight: 620;
+  line-height: 0.92;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: uppercase;
+  word-spacing: var(--ripple_about_word_space);
+  filter: blur(var(--ripple_about_blur));
+  opacity: var(--ripple_about_alpha);
+  will-change: opacity, filter;
+}
+
+.ripple_about_line {
+  display: block;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.ripple_about_line:nth-child(1) {
+  transform: translate3d(var(--ripple_about_line_1), var(--ripple_about_lift), 0);
+}
+
+.ripple_about_line:nth-child(2) {
+  transform: translate3d(var(--ripple_about_line_2), calc(var(--ripple_about_lift) * 0.82), 0);
+}
+
+.ripple_about_line:nth-child(3) {
+  transform: translate3d(var(--ripple_about_line_3), calc(var(--ripple_about_lift) * 0.64), 0);
+}
+
+.ripple_about_line:nth-child(4) {
+  transform: translate3d(var(--ripple_about_line_4), calc(var(--ripple_about_lift) * 0.46), 0);
+}
+
+.ripple_about_line:nth-child(5) {
+  transform: translate3d(var(--ripple_about_line_5), calc(var(--ripple_about_lift) * 0.3), 0);
+}
+
+.ripple_about_line:nth-child(6) {
+  transform: translate3d(var(--ripple_about_line_6), calc(var(--ripple_about_lift) * 0.18), 0);
+}
+
+.ripple_about_copy {
+  max-width: 1020px;
+  margin: clamp(52px, 7vh, 76px) auto 0;
+  color: rgb(28 42 72 / 76%);
+  font-size: clamp(17px, 1.26vw, 24px);
+  font-weight: 520;
+  line-height: 1.68;
+  letter-spacing: 0;
+  opacity: var(--ripple_about_alpha);
+  transform: translate3d(0, calc(var(--ripple_about_lift) * 0.34), 0);
+  transition: opacity 80ms linear;
+  will-change: opacity, transform;
+  word-break: keep-all;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ripple_after {
+    --ripple_about_alpha: 1;
+    --ripple_about_blur: 0;
+    --ripple_about_lift: 0;
+    --ripple_about_word_space: 0;
+    --ripple_about_line_1: 0;
+    --ripple_about_line_2: 0;
+    --ripple_about_line_3: 0;
+    --ripple_about_line_4: 0;
+    --ripple_about_line_5: 0;
+    --ripple_about_line_6: 0;
+  }
+}
+
+.ripple_transition {
+  position: relative;
+  z-index: 1;
+  min-height: 108vh;
+  margin-top: -24vh;
+  padding-top: 24vh;
+  overflow: visible;
+  background: transparent;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.ripple_transition::before,
+.ripple_transition::after {
+  position: absolute;
+  pointer-events: none;
+}
+
+.ripple_transition::before,
+.ripple_transition::after {
+  inset: 0;
+  content: "";
+}
+
+.ripple_transition::before {
+  z-index: 1;
+  inset: -24% -18% -10%;
+  background:
+    linear-gradient(118deg, transparent 0%, transparent 26%, rgb(255 255 255 / 18%) 40%, rgb(237 244 255 / 54%) 58%, rgb(156 179 247 / 22%) 72%, transparent 90%),
+    radial-gradient(92% 44% at 20% 34%, rgb(255 255 255 / 26%), transparent 70%),
+    radial-gradient(78% 48% at 78% 42%, rgb(118 149 239 / 22%), transparent 76%),
+    radial-gradient(110% 52% at 52% 72%, rgb(255 255 255 / 54%), transparent 78%);
+  filter: blur(34px);
+  mix-blend-mode: screen;
+  opacity: 0.92;
+  transform: translate3d(-2vw, 0, 0) scale(1.08);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 30%, rgb(0 0 0 / 18%) 44%, rgb(0 0 0 / 58%) 58%, #000 72%, #000 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, transparent 30%, rgb(0 0 0 / 18%) 44%, rgb(0 0 0 / 58%) 58%, #000 72%, #000 90%, transparent 100%);
+  animation: rippleTransitionVeil 18000ms ease-in-out infinite;
+}
+
+.ripple_transition::after {
+  z-index: 2;
+  inset: -8% -8% -18%;
+  background:
+    linear-gradient(to bottom, transparent 0%, transparent 34%, rgb(255 255 255 / 16%) 54%, rgb(255 255 255 / 48%) 76%, #fff 100%),
+    radial-gradient(120% 42% at 54% 78%, rgb(255 255 255 / 72%), transparent 74%),
+    radial-gradient(84% 34% at 30% 58%, rgb(232 240 255 / 28%), transparent 72%);
+  filter: blur(18px);
+  opacity: 0.9;
+  transform: translate3d(0, 0, 0) scale(1.04);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 34%, rgb(0 0 0 / 16%) 48%, rgb(0 0 0 / 42%) 64%, #000 82%, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, transparent 34%, rgb(0 0 0 / 16%) 48%, rgb(0 0 0 / 42%) 64%, #000 82%, #000 100%);
+  animation: rippleTransitionCurtain 15000ms ease-in-out infinite;
+}
+
+@keyframes rippleTransitionVeil {
+  0%,
+  100% {
+    opacity: 0.86;
+    transform: translate3d(-2vw, -10px, 0) scale(1.08);
+  }
+
+  50% {
+    opacity: 0.98;
+    transform: translate3d(2vw, 20px, 0) scale(1.12);
+  }
+}
+
+@keyframes rippleTransitionCurtain {
+  0%,
+  100% {
+    opacity: 0.84;
+    transform: translate3d(0, -8px, 0) scale(1.04);
+  }
+
+  50% {
+    opacity: 0.96;
+    transform: translate3d(-1.4vw, 18px, 0) scale(1.075);
+  }
 }
 
 @media (max-width: 820px) {
@@ -1219,6 +1458,32 @@ footer address {
 
   .ripple_nav_tabs {
     gap: clamp(22px, 8vw, 42px);
+  }
+
+  .ripple_about_intro {
+    padding: 90px 18px 120px;
+  }
+
+  .ripple_about_kicker {
+    margin-bottom: 22px;
+    font-size: 15px;
+  }
+
+  .ripple_about_intro h2 {
+    font-size: clamp(38px, 12vw, 64px);
+    line-height: 0.96;
+    word-spacing: calc(var(--ripple_about_word_space) * 0.42);
+  }
+
+  .ripple_about_line {
+    white-space: normal;
+  }
+
+  .ripple_about_copy {
+    max-width: 100%;
+    margin-top: 42px;
+    font-size: 16px;
+    line-height: 1.7;
   }
 
   .header {
@@ -1353,5 +1618,41 @@ footer address {
     --ripple_title_y: -22px;
 
     max-width: calc(100vw - 36px);
+  }
+
+  .ripple_transition {
+    min-height: 100vh;
+  }
+}
+
+.skill-up-note-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #121212;
+}
+
+.skill-up-note-frame.elif-source-stack {
+  display: block;
+  width: min(100%, 1920px);
+  height: auto;
+  margin: 0 auto;
+  overflow: hidden;
+  background: #121212;
+  transform: none;
+}
+
+.elif-source-section {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .skill-up-note-frame.elif-source-stack {
+    left: auto;
+    transform: none;
+    transform-origin: initial;
   }
 }
