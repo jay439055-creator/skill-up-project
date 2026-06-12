@@ -1,9 +1,8 @@
 import {
   branchInterfaceSteps,
   retrievableHistoryCards,
-  whatIfCards,
-  whatIfMeetingSources,
 } from "./skillUpNoteContent";
+import { SkillUpNoteWhatIf } from "./SkillUpNoteWhatIf";
 
 export function SkillUpNoteSolution() {
   return (
@@ -116,83 +115,7 @@ export function SkillUpNoteSolution() {
         </div>
       </section>
 
-      <section className="note-whatif-section" aria-label="Tailored alternative what-if">
-        <p>Tailored Alternative</p>
-        <h2>Tailored Alternative: What-if</h2>
-        <p className="note-section-copy">
-          막힌 회의의 다음 장면을 여러 가능성으로 펼치고, 선택한 대안을 브랜치에 반영합니다.
-        </p>
-        <div className="note-whatif-stage one">
-          <div className="note-stage-number">1</div>
-          <div>
-            <h3>Context Aware Suggestion</h3>
-            <p>현재 회의에서 멈춘 지점과 이전 회의 기록을 함께 읽어, 지금 필요한 개입 맥락을 먼저 정리합니다.</p>
-          </div>
-          <div className="note-context-mockup" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        </div>
-
-        <div className="note-whatif-stage two">
-          <div className="note-stage-number">2</div>
-          <div>
-            <h3>Context Aware Suggestion</h3>
-            <p>회의의 본류와 분기된 논의를 나누어 보여주고, 브랜치에서 다시 가져올 수 있는 대안 후보를 좁힙니다.</p>
-          </div>
-          <div className="note-context-mockup branch-preview" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        </div>
-
-        <div className="note-option-heading">
-          <span>3</span>
-          <div>
-            <p>Option Cards</p>
-            <h3>맥락에 맞는 대안을 카드로 비교합니다.</h3>
-          </div>
-        </div>
-
-        <div className="note-whatif-panel" aria-label="What-if option cards">
-          <header className="note-whatif-header">
-            <div>
-              <small>What if</small>
-              <strong>가능한 대안 3개를 생성했어요</strong>
-            </div>
-            <nav aria-label="What-if actions">
-              <button type="button">적용 기준 보기</button>
-              <button type="button">다시 생성하기</button>
-              <button type="button" className="is-primary">브랜치에 반영하기</button>
-            </nav>
-          </header>
-          <div className="note-whatif-body">
-            <div className="note-whatif-cards">
-              {whatIfCards.map((card) => (
-                <article className={`note-whatif-card ${card.tone}`} key={card.title}>
-                  <h3>{card.title}</h3>
-                  <p>{card.body}</p>
-                </article>
-              ))}
-            </div>
-            <aside className="note-whatif-summary">
-              <div className="note-whatif-toggle" aria-label="Summary view mode">
-                <span className="is-active">요약 보기</span>
-                <span>상세 보기</span>
-              </div>
-              <h3>참고한 이전 회의</h3>
-              <ul>
-                {whatIfMeetingSources.map((source) => (
-                  <li key={source}>{source}</li>
-                ))}
-              </ul>
-              <p>1 / 4</p>
-            </aside>
-          </div>
-        </div>
-      </section>
+      <SkillUpNoteWhatIf />
 
       <section className="note-final-section" aria-label="Final Back on Track preview">
         <p>Back on Track</p>

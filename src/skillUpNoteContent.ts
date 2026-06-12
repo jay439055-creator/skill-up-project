@@ -46,6 +46,7 @@ export type BranchInterfaceStep = {
 
 export type WhatIfCard = {
   readonly body: string;
+  readonly sourceItems: readonly string[];
   readonly tone: "default" | "featured" | "muted";
   readonly title: string;
 };
@@ -206,16 +207,19 @@ export const branchInterfaceSteps = [
 export const whatIfCards = [
   {
     body: "홈 하단 슬라이드업 카드로 세 가지 보안 만족도 문항을 순서대로 체크하면, 별도 이동 없이 10초 만에 설문이 끝나고 즉시 결과 그래프로 신뢰를 확인할 수 있다. 참여가 가볍고 보상이 즉각적.",
+    sourceItems: [],
     title: "한번에 스윽 넘기고, 확인하는 보안 만족도",
     tone: "default",
   },
   {
     body: "알림으로 호출된 DM 챗봇이 재미있는 밈과 스티커를 보여주며 ‘우리 앱 보안 만족?’ 등 세 가지 예·아니오 질문을 던지고, 답변마다 맞춤 스티커·즉시 피드백을 제공.",
+    sourceItems: [],
     title: "번거롭다는 인식의 역전, 챗봇 퀴즈로 가벼운 보안 점검",
     tone: "featured",
   },
   {
-    body: "사용자가 이해되지 않는 지점에 질문을 남기면, AI가 해당 UI 흐름을 간결하게 리디자인하여 제시합니다. 반복 피드백 없이도 사용자 중심 개선이 실시간으로 이뤄집니다.",
+    body: "메인 피드 상단 ‘내 캠퍼스 보안 지수 78점’ 위젯을 탭하면 네 단계 미만의 막대그래프 설문이 뜬다. 완료 즉시 점수와 캠퍼스 순위가 갱신되며, 경쟁 플랫폼 비교 그래프도 함께 노출해 앱의 차별성을 각인.",
+    sourceItems: ["캠퍼스별 보안 지수 위젯 구조", "랭킹 경쟁 심리 활용 인센티브 전략", "교재쿠폰 배지 리워드 배분 로직"],
     title: "AI 기반 리디자인 피드백 시스템 도입 가능성",
     tone: "muted",
   },
