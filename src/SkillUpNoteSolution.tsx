@@ -1,6 +1,3 @@
-import {
-  retrievableHistoryCards,
-} from "./skillUpNoteContent";
 import { SkillUpNoteBackTrack } from "./SkillUpNoteBackTrack";
 import { SkillUpNoteWhatIf } from "./SkillUpNoteWhatIf";
 
@@ -62,31 +59,22 @@ export function SkillUpNoteSolution() {
 
       <section className="note-library-section" aria-label="Library for retrievable history">
         <p>Library</p>
-        <h2>Library for Retrievable History</h2>
+        <h2 className="note-library-title">
+          <span>Library</span>{" "}
+          <span>for Retrievable History</span>
+        </h2>
         <p className="note-section-copy">
-          회의에서 흘러간 말들을 다시 찾을 수 있는 단위로 묶어, 다음 회의의 판단 근거로 되살립니다.
+          모든 회의 건은 홈에 프로젝트별 연대기 형식으로 정리됩니다.
+          <br />
+          간편히 과거 회의나 필요 정보를 불러오고 열람할 수 있습니다.
         </p>
         <div className="note-library-panel">
-          <div className="note-library-tabs" aria-label="Library filters">
-            <span className="is-active">전체 히스토리</span>
-            <span>주장</span>
-            <span>근거</span>
-            <span>결정</span>
-          </div>
-          <div className="note-library-search">이전 회의에서 비슷한 맥락 찾기</div>
-          <div className="note-library-grid">
-            {retrievableHistoryCards.map((card) => (
-              <article className="note-library-card" key={card.meta}>
-                <small>{card.meta}</small>
-                <h3>{card.title}</h3>
-                <ul>
-                  {card.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </div>
+          <img
+            alt="ELiF Library screen"
+            className="note-library-ui-image"
+            loading="eager"
+            src="/figma/skill-up-note/library-history-source.jpg"
+          />
         </div>
       </section>
 

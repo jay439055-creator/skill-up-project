@@ -163,6 +163,7 @@ test("skill up note does not paste the full Behance board as a screenshot", asyn
       "/figma/skill-up-note/elif-logo-source.svg",
       "/figma/skill-up-note/field-research-photo.png",
       "/figma/skill-up-note/hero-macbook-source.png",
+      "/figma/skill-up-note/library-history-source.jpg",
       "/figma/skill-up-note/question-photo-source.png",
     ];
 
@@ -192,6 +193,15 @@ test("skill up note does not paste the full Behance board as a screenshot", asyn
 
 test("skill up note extracted assets remain responsive on mobile", async ({ page }) => {
   await openSkillUpNote(page, { width: 390, height: 844 });
+  await page.waitForFunction(() => {
+    const images = Array.from(
+      document.querySelectorAll(
+        "[data-testid='figma-hero-mockup'], [data-testid='figma-elif-logo'], [data-testid='figma-question-photo'], [data-testid='figma-field-photo']",
+      ),
+    );
+
+    return images.length === 4 && images.every((element) => element instanceof HTMLImageElement && element.naturalWidth > 0);
+  });
 
   const metrics = await page.evaluate(() => {
     const loadedImages = Array.from(

@@ -8,6 +8,11 @@ async function openSkillUpNote(page, viewportSize = { width: 1440, height: 900 }
 
 test("skill up note lower solution sections use only approved extracted assets", async ({ page }) => {
   await openSkillUpNote(page, { width: 1440, height: 900 });
+  await page.waitForFunction(() => {
+    const image = document.querySelector(".note-library-ui-image");
+
+    return image instanceof HTMLImageElement && image.naturalWidth === 1540 && image.naturalHeight === 980;
+  });
 
   const implementation = await page.evaluate(() => {
     const allowedImageSources = [
@@ -16,6 +21,7 @@ test("skill up note lower solution sections use only approved extracted assets",
       "/figma/skill-up-note/elif-logo-source.svg",
       "/figma/skill-up-note/field-research-photo.png",
       "/figma/skill-up-note/hero-macbook-source.png",
+      "/figma/skill-up-note/library-history-source.jpg",
       "/figma/skill-up-note/question-photo-source.png",
     ];
     const text = document.body.innerText;
@@ -28,6 +34,8 @@ test("skill up note lower solution sections use only approved extracted assets",
       return urls.map((value) => ({ className: element.className.toString(), value }));
     });
 
+    const libraryImage = document.querySelector(".note-library-ui-image");
+
     return {
       allowedImageSources,
       backgroundUrls,
@@ -39,6 +47,11 @@ test("skill up note lower solution sections use only approved extracted assets",
       whatIfStages: document.querySelectorAll(".note-whatif-stage").length,
       fullBoardImages: Array.from(document.images).filter((image) => image.naturalHeight > 10_000 || /behance|final|최종/i.test(image.src)),
       imageSources: Array.from(document.images).map((image) => new URL(image.src).pathname),
+      libraryImage: {
+        height: libraryImage instanceof HTMLImageElement ? libraryImage.naturalHeight : 0,
+        src: libraryImage instanceof HTMLImageElement ? libraryImage.getAttribute("src") ?? "" : "",
+        width: libraryImage instanceof HTMLImageElement ? libraryImage.naturalWidth : 0,
+      },
       sections: {
         branch: document.querySelectorAll(".note-branch-section").length,
         final: document.querySelectorAll(".note-final-section").length,
@@ -51,10 +64,15 @@ test("skill up note lower solution sections use only approved extracted assets",
 
   expect(implementation.fullBoardImages).toHaveLength(0);
   expect(implementation.imageSources.sort()).toEqual(implementation.allowedImageSources.sort());
+  expect(implementation.libraryImage).toEqual({
+    height: 980,
+    src: "/figma/skill-up-note/library-history-source.jpg",
+    width: 1540,
+  });
   expect(implementation.backgroundUrls).toHaveLength(0);
-  expect(implementation.embeddedMedia).toBe(2);
+  expect(implementation.embeddedMedia).toBe(3);
   expect(implementation.sections).toEqual({ branch: 1, final: 1, library: 1, whatIf: 1 });
-  expect(implementation.domCards).toBeGreaterThanOrEqual(7);
+  expect(implementation.domCards).toBeGreaterThanOrEqual(3);
   expect(implementation.whatIfStages).toBe(2);
   expect(implementation.buttons).toEqual(["적용 기준 보기", "다시 생성하기", "브랜치에 반영하기"]);
   const normalizedText = implementation.text.replace(/\s+/g, " ");
