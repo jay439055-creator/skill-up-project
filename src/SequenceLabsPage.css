@@ -1,0 +1,261 @@
+.labs-page {
+  --labs-bg: #08090a;
+  --labs-fg: #fff;
+  --labs-muted: rgb(255 255 255 / 62%);
+  --labs-soft: rgb(255 255 255 / 42%);
+  --labs-card-bg: #161719;
+  --labs-card-stroke: rgb(255 255 255 / 15%);
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--labs-bg);
+  color: var(--labs-fg);
+  font-family: twkLausanne, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+}
+
+.labs-page h1,
+.labs-page h2,
+.labs-page h3,
+.labs-page p {
+  margin: 0;
+}
+
+.labs-page h2,
+.labs-page h3,
+.labs-page .labs-meta,
+.labs-page a,
+.labs-side-nav {
+  font-family: sfMono, "SFMono-Regular", Consolas, monospace;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.labs-back-link,
+.labs-clock,
+.labs-built-by,
+.labs-side-nav {
+  position: fixed;
+  z-index: 20;
+  color: var(--labs-fg);
+  font-size: 9px;
+  line-height: 9px;
+}
+
+.labs-back-link {
+  top: 0;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  min-height: 29px;
+  padding: 4px 10px 5px 2px;
+  border-bottom-right-radius: 8px;
+  background: var(--labs-bg);
+}
+
+.labs-clock {
+  top: 0;
+  right: 10px;
+  min-width: 126px;
+  padding-top: 8px;
+  text-align: right;
+}
+
+.labs-built-by {
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 7px 9px 8px 13px;
+  border-top-left-radius: 8px;
+  background: var(--labs-bg);
+}
+
+.labs-built-by span {
+  color: var(--labs-soft);
+}
+
+.labs-built-by strong {
+  font-weight: 400;
+}
+
+.labs-side-nav {
+  top: 50%;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(-50%);
+}
+
+.labs-side-nav a {
+  padding: 6px 7px;
+  border-top-left-radius: 7px;
+  border-bottom-left-radius: 7px;
+  background: rgb(255 255 255 / 8%);
+  color: rgb(255 255 255 / 45%);
+  font-size: 11px;
+  line-height: 12px;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.labs-side-nav a:hover {
+  background: rgb(255 255 255 / 14%);
+  color: var(--labs-fg);
+}
+
+.sequence-glyph {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(3, 7px);
+  grid-template-rows: repeat(3, 7px);
+  width: 23px;
+  height: 23px;
+}
+
+.sequence-glyph span {
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+}
+
+.sequence-glyph span:nth-child(1) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.sequence-glyph span:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.sequence-glyph span:nth-child(3) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.sequence-glyph span:nth-child(4) {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.sequence-glyph span:nth-child(5) {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.sequence-glyph span:nth-child(6) {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.sequence-glyph span:nth-child(7) {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+.labs-hero {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(100% - 20px);
+  min-height: calc(100vh - 20px);
+  margin: 10px auto 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #02031f;
+}
+
+.labs-hero img,
+.labs-cta > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.labs-hero img {
+  animation: labs-hero-drift 14s ease-in-out infinite alternate;
+  filter: saturate(1.05) contrast(1.05);
+  transform: scale(1.03);
+}
+
+.labs-noise {
+  position: absolute;
+  inset: -50%;
+  z-index: 2;
+  pointer-events: none;
+  background: transparent url("/sequence-labs/noise-transparent.png") repeat 0 0;
+  background-size: 300px 300px;
+  opacity: 1;
+  animation: labs-noise 0.3s steps(5) infinite;
+}
+
+.labs-hero h1 {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--labs-fg);
+  font-size: 33px;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.labs-hero h1 .sequence-glyph {
+  width: 36px;
+  height: 36px;
+  grid-template-columns: repeat(3, 12px);
+  grid-template-rows: repeat(3, 12px);
+}
+
+.labs-hero h1 .sequence-glyph span {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+
+.labs-hero h1 em {
+  margin-left: 2px;
+  font-family: sfMono, "SFMono-Regular", Consolas, monospace;
+  font-size: 19px;
+  font-style: normal;
+  letter-spacing: 6px;
+}
+
+@keyframes labs-noise {
+  0% {
+    transform: translate(0);
+  }
+
+  25% {
+    transform: translate(-2%, 3%);
+  }
+
+  50% {
+    transform: translate(2%, -4%);
+  }
+
+  75% {
+    transform: translate(-3%, -1%);
+  }
+
+  100% {
+    transform: translate(1%, 2%);
+  }
+}
+
+@keyframes labs-hero-drift {
+  from {
+    transform: scale(1.03) translate3d(-1%, -1%, 0);
+  }
+
+  to {
+    transform: scale(1.07) translate3d(1.5%, 1%, 0);
+  }
+}

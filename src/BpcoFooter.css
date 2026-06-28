@@ -1,0 +1,121 @@
+.bpco_footer {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 100vh;
+  min-height: 900px;
+  padding: 30px 40px;
+  box-sizing: border-box;
+  background: #f4f2ed;
+  color: #080808;
+}
+
+.bpco_footer .deco_img {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bpco_footer .deco_img img {
+  width: auto;
+  height: auto;
+  margin: 0;
+}
+
+.bpco_footer .main_copy {
+  position: absolute;
+  top: calc(50% - 180px);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.bpco_footer .main_copy canvas {
+  display: block;
+  width: 1000px;
+  height: 300px;
+}
+
+.bpco_footer .bottom_section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 1100px;
+}
+
+.bpco_footer .logo_section img {
+  width: 143px;
+  height: auto;
+  margin: 0;
+}
+
+.bpco_footer .company_info_items {
+  display: flex;
+  gap: 40px;
+  margin-top: 48px;
+  font-size: 17px;
+  line-height: normal;
+}
+
+.bpco_footer .company_info_items a {
+  text-decoration: underline;
+}
+
+.bpco_footer .info_copy {
+  margin-top: 48px;
+  width: 1100px;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media screen and (max-width: 900px) {
+  .bpco_footer {
+    height: 450px;
+    min-height: 450px;
+    padding: 15px;
+  }
+
+  .bpco_footer .deco_img {
+    display: none;
+  }
+
+  .bpco_footer .main_copy {
+    top: calc(50% - 180px);
+    left: 0;
+    right: 0;
+  }
+
+  .bpco_footer .main_copy canvas {
+    width: 300px;
+    height: 90px;
+    transform: scale(1);
+    transform-origin: center center;
+  }
+
+  .bpco_footer .bottom_section,
+  .bpco_footer .info_copy {
+    width: 100%;
+  }
+
+  .bpco_footer .logo_section img {
+    width: 100px;
+  }
+
+  .bpco_footer .company_info_items {
+    gap: 10px;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+
+  .bpco_footer .info_copy {
+    margin-top: 20px;
+    font-size: 12px;
+    line-height: 13px;
+  }
+}

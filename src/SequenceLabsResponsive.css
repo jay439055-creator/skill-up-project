@@ -1,0 +1,85 @@
+@media (max-width: 767px) {
+  .labs-side-nav {
+    display: none;
+  }
+
+  .labs-clock {
+    right: 8px;
+    min-width: 110px;
+    font-size: 8px;
+  }
+
+  .labs-back-link {
+    left: 8px;
+    max-width: calc(100vw - 96px);
+    font-size: 8px;
+  }
+
+  .labs-built-by {
+    font-size: 8px;
+  }
+
+  .labs-hero {
+    min-height: calc(100vh - 20px);
+  }
+
+  .labs-hero h1 {
+    gap: 8px;
+    font-size: 28px;
+  }
+
+  .labs-hero h1 em {
+    font-size: 14px;
+    letter-spacing: 4px;
+  }
+
+  .labs-info-grid,
+  .labs-hack,
+  .labs-cta {
+    display: block;
+    padding: 56px 24px;
+  }
+
+  .labs-info-grid {
+    min-height: auto;
+  }
+
+  .labs-about-copy p,
+  .labs-how,
+  .labs-hack-copy,
+  .labs-cta-links {
+    margin-top: 56px;
+  }
+
+  .labs-card {
+    display: block;
+    min-height: 0;
+    padding: 40px 24px;
+  }
+
+  .labs-card-art {
+    width: min(100%, 400px);
+    margin: 0 auto 64px;
+  }
+
+  .labs-card-copy {
+    max-width: none;
+  }
+
+  .labs-card-copy > p:not(.labs-meta) {
+    margin-top: 36px;
+  }
+
+  .labs-cta {
+    min-height: 720px;
+  }
+
+  .labs-cta p {
+    font-size: 23px;
+  }
+
+  .labs-cta-links {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

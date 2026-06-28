@@ -1,0 +1,85 @@
+.skbp-responsive-page {
+  background: #ffffff;
+  width: 100vw;
+}
+
+.skbp-responsive-page--iframeOnly {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.skbp-responsive-page--a11ywayHero {
+  background: #f3f4f6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.experience-detail-shell {
+  background: #ffffff;
+  width: 100vw;
+}
+
+.experience-detail-shell--iframeOnly {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.experience-detail-shell--a11ywayHero {
+  --tuniverse-frame-height: 42337px;
+  background: #f3f4f6;
+  min-height: var(--tuniverse-frame-height);
+  overflow: hidden;
+}
+
+.skbp-responsive-frame {
+  border: 0;
+  display: block;
+  width: 100vw;
+}
+
+.skbp-responsive-frame--iframeOnly {
+  height: 100vh;
+}
+
+.skbp-responsive-frame--a11ywayHero {
+  height: var(--tuniverse-frame-height);
+  min-height: 100vh;
+}
+
+html.skbp-responsive-mode,
+html.skbp-responsive-mode body,
+html.skbp-responsive-mode #root {
+  background: #ffffff;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+html.skbp-responsive-scroll-mode,
+html.skbp-responsive-scroll-mode body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html.skbp-responsive-scroll-mode #root {
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .experience-detail-shell--a11ywayHero {
+    --tuniverse-frame-height: 52000px;
+  }
+}
+
+@media (max-width: 520px) {
+  .experience-detail-shell--a11ywayHero {
+    --tuniverse-frame-height: 62000px;
+  }
+}

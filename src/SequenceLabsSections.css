@@ -1,0 +1,112 @@
+.labs-info-grid,
+.labs-hack,
+.labs-cta {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  width: calc(100% - 20px);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 96px 24px;
+}
+
+.labs-info-grid {
+  min-height: 748px;
+}
+
+.labs-info-grid h2,
+.labs-info-grid h3,
+.labs-hack h2,
+.labs-hack h3,
+.labs-cta h2 {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.labs-about-copy {
+  grid-column: 1 / span 5;
+}
+
+.labs-about-copy p {
+  max-width: 45ch;
+  margin-top: 42px;
+  color: var(--labs-fg);
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+.labs-how {
+  grid-column: 7 / span 6;
+}
+
+.labs-how h3 {
+  color: var(--labs-muted);
+}
+
+.labs-how > p,
+.labs-hack-copy > p {
+  margin-top: 33px;
+  color: var(--labs-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.labs-numbered-list {
+  display: grid;
+  gap: 18px;
+  margin: 28px 0 42px;
+  padding: 0;
+  list-style: none;
+}
+
+.labs-numbered-list li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 0;
+}
+
+.labs-numbered-list span {
+  color: var(--labs-soft);
+  font-family: sfMono, "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  line-height: 24px;
+}
+
+.labs-numbered-list p {
+  color: var(--labs-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.labs-numbered-list strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--labs-fg);
+  font-weight: 300;
+}
+
+.labs-hack {
+  min-height: 592px;
+  padding-top: 64px;
+  padding-bottom: 80px;
+}
+
+.labs-hack > div:first-child {
+  grid-column: 1 / span 4;
+}
+
+.labs-hack > div:first-child p {
+  margin-top: 22px;
+  color: var(--labs-muted);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.labs-hack-copy {
+  grid-column: 7 / span 6;
+}
+
+.labs-hack-copy h3 {
+  margin-top: 40px;
+  color: var(--labs-soft);
+}
