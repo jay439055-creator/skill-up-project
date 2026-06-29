@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BpcoHeroCanvas } from "./BpcoHeroCanvas";
 import { assets, businessItems, philosophyItems, projectItems } from "./bpcoContent";
 import { RippleExperience } from "./RippleExperience";
+import { getWorkProjectFromPathname } from "./ripplePortfolio";
 import { SkillUpNotePage } from "./SkillUpNotePage";
 
 const clamp = (value: number, min = 0, max = 1): number => Math.min(Math.max(value, min), max);
@@ -228,11 +229,13 @@ function BpcoPage() {
 }
 
 export function App() {
+  const isRippleWorkRoute = getWorkProjectFromPathname(window.location.pathname) !== undefined;
+
   if (window.location.pathname === "/skill-up-note") {
     return <SkillUpNotePage />;
   }
 
-  if (window.location.pathname === "/ripple") {
+  if (window.location.pathname === "/ripple" || isRippleWorkRoute) {
     return <RippleExperience />;
   }
 
