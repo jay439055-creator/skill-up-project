@@ -1,9 +1,16 @@
 import { expect, test } from "playwright/test";
 
 const SKBP_ROUTE = "/a11yway#skbp";
-const SKBP_EXPERIENCE_URL = "https://www.plus-ex.com/experience#skbp";
+const SKBP_EXPERIENCE_URL = "/experience";
+const SKBP_DETAIL_IFRAME_SELECTOR =
+  "iframe[src^='/source/iframe/portfolio/skbp.html'], iframe[src^='http://127.0.0.1'][src*='/source/iframe/portfolio/skbp.html'], iframe[src^='https://www.plus-ex.com/source/iframe/portfolio/skbp.html']";
+const SKBP_REFERENCE_EXPERIENCE_URL = "https://www.plus-ex.com/experience#skbp";
 const TUNIVERSE_ROUTE = "/tuniverse";
 const TUNIVERSE_DETAIL_URL = "https://www.plus-ex.com/source/iframe/portfolio/tuniverse.html";
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 async function readExperienceMetrics(frame) {
   return frame.evaluate(() => {
@@ -28,23 +35,37 @@ async function openLocalSkbp(page, viewportSize) {
   await expect(page.getByTestId("skbp-responsive-page")).toBeVisible();
 
   const iframe = page.locator("iframe[title='Plus X SKBP responsive reference']");
-  await expect(iframe).toHaveAttribute("src", SKBP_EXPERIENCE_URL);
+  await expect(iframe).toHaveAttribute("data-source-url", SKBP_EXPERIENCE_URL);
 
   await expect
-    .poll(() => page.frames().some((candidate) => candidate.url().includes("/experience#skbp")), {
-      message: "SKBP experience iframe is attached",
-      timeout: 15_000,
-    })
-    .toBe(true);
+    .poll(
+      async () => {
+        const iframeHandle = await iframe.elementHandle();
+        const frame = await iframeHandle?.contentFrame();
+        return frame?.url() ?? "";
+      },
+      {
+        message: "SKBP experience iframe opened through the local proxy",
+        timeout: 15_000,
+      },
+    )
+    .toContain(SKBP_EXPERIENCE_URL);
 
-  const frame = page.frames().find((candidate) => candidate.url().includes("/experience#skbp"));
+  const iframeHandle = await iframe.elementHandle();
+  const frame = await iframeHandle?.contentFrame();
   expect(frame, "SKBP experience iframe is attached").toBeTruthy();
   await expect
     .poll(() => readExperienceMetrics(frame).then((metrics) => metrics.imageCount), {
       message: "SKBP experience app rendered image content",
-      timeout: 20_000,
+      timeout: 15_000,
     })
     .toBeGreaterThan(0);
+  await expect
+    .poll(() => frame.locator("[data-a11yway-featured-card='skbp']").count(), {
+      message: "featured SKBP card is inserted",
+      timeout: 20_000,
+    })
+    .toBe(1);
 
   return {
     frame,
@@ -60,7 +81,7 @@ async function openLocalSkbp(page, viewportSize) {
 
 async function openReferenceExperience(page, viewportSize) {
   await page.setViewportSize(viewportSize);
-  await page.goto(SKBP_EXPERIENCE_URL, { waitUntil: "domcontentloaded" });
+  await page.goto(SKBP_REFERENCE_EXPERIENCE_URL, { waitUntil: "domcontentloaded" });
   await expect
     .poll(() => readExperienceMetrics(page.mainFrame()).then((metrics) => metrics.imageCount), {
       message: "reference experience app rendered image content",
@@ -68,6 +89,34 @@ async function openReferenceExperience(page, viewportSize) {
     })
     .toBeGreaterThan(0);
   return readExperienceMetrics(page.mainFrame());
+}
+
+async function getSkbpDetailFrame(frame) {
+  await expect
+    .poll(
+      async () => {
+        const iframeHandle = await frame.locator(SKBP_DETAIL_IFRAME_SELECTOR).first().elementHandle();
+        const detailFrame = await iframeHandle?.contentFrame();
+        return detailFrame?.url() ?? "";
+      },
+      {
+        message: "SKBP detail iframe is opened through the local portfolio proxy",
+        timeout: 20_000,
+      },
+    )
+    .toMatch(/^http:\/\/127\.0\.0\.1:\d+\/source\/iframe\/portfolio\/skbp\.html$/);
+
+  const iframeHandle = await frame.locator(SKBP_DETAIL_IFRAME_SELECTOR).first().elementHandle();
+  const detailFrame = await iframeHandle?.contentFrame();
+  expect(detailFrame, "SKBP detail iframe is attached").toBeTruthy();
+  await expect
+    .poll(() => readExperienceMetrics(detailFrame).then((metrics) => metrics.text), {
+      message: "SKBP detail content is visible after clicking the featured card",
+      timeout: 20_000,
+    })
+    .toContain("ZERO");
+
+  return detailFrame;
 }
 
 async function openLocalTuniverse(page, viewportSize) {
@@ -133,10 +182,20 @@ test("SKBP responsive desktop entry matches reference frame metrics", async ({ b
   const local = await openLocalSkbp(localPage, viewportSize);
   const localMetrics = await readExperienceMetrics(local.frame);
   const referenceMetrics = await openReferenceExperience(referencePage, viewportSize);
+  const firstFeaturedCard = await local.frame.locator(".experience__list > [data-a11yway-featured-card='skbp']").evaluate(
+    (element) => ({
+      href: element.querySelector("a")?.href,
+      image: element.querySelector("img")?.src,
+    }),
+  );
 
   expect(local.top.iframeCount).toBe(1);
   expect(local.top.scrollWidth).toBe(local.top.clientWidth);
-  expect(localMetrics.imageCount).toBeGreaterThanOrEqual(referenceMetrics.imageCount);
+  expect(firstFeaturedCard).toEqual({
+    href: SKBP_REFERENCE_EXPERIENCE_URL,
+    image: "https://www.plus-ex.com/source/iframe/thumbnail/img_thumb_135.jpg",
+  });
+  expect(localMetrics.imageCount).toBe(referenceMetrics.imageCount + 1);
   expect(localMetrics.firstImageWidth).toBe(referenceMetrics.firstImageWidth);
   expect(Math.abs(localMetrics.scrollHeight - referenceMetrics.scrollHeight)).toBeLessThanOrEqual(32);
 
@@ -156,7 +215,8 @@ test("SKBP responsive mobile entry avoids raw 1280 overflow", async ({ browser }
   expect(local.top.scrollWidth).toBe(local.top.clientWidth);
   expect(localMetrics.scrollWidth).toBe(referenceMetrics.scrollWidth);
   expect(localMetrics.scrollHeight).toBeGreaterThan(10_000);
-  expect(Math.abs(localMetrics.scrollHeight - referenceMetrics.scrollHeight)).toBeLessThanOrEqual(600);
+  expect(localMetrics.scrollHeight - referenceMetrics.scrollHeight).toBeGreaterThanOrEqual(0);
+  expect(localMetrics.scrollHeight - referenceMetrics.scrollHeight).toBeLessThanOrEqual(1_000);
   expect(localMetrics.firstImageWidth).toBe(referenceMetrics.firstImageWidth);
 
   await context.close();
@@ -176,6 +236,169 @@ test("SKBP responsive tablet entry preserves detail content without wrapper over
   expect(localMetrics.text).toContain("eXperience");
 
   await context.close();
+});
+
+test("SKBP detail close button returns to the experience list", async ({ browser }) => {
+  const viewportSize = { width: 1440, height: 900 };
+  const context = await browser.newContext({ viewport: viewportSize });
+  const localPage = await context.newPage();
+
+  await localPage.route(
+    (url) => url.hostname.includes("vimeocdn.com") || url.pathname.endsWith(".mp4"),
+    (route) => route.abort(),
+  );
+
+  const local = await openLocalSkbp(localPage, viewportSize);
+  expect(await local.frame.locator(SKBP_DETAIL_IFRAME_SELECTOR).count()).toBe(0);
+
+  await local.frame.evaluate(() => {
+    const card = document.querySelector("[data-a11yway-featured-card='skbp']");
+    card?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  });
+  const detailFrame = await getSkbpDetailFrame(local.frame);
+  await expect(localPage).toHaveURL(/\/a11yway\/skbp$/);
+
+  await detailFrame.evaluate(() => {
+    const closeButton = document.querySelector(".exper_close");
+    closeButton?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  });
+  await expect(localPage).toHaveURL(/\/a11yway#skbp$/);
+  await expect
+    .poll(() => readExperienceMetrics(local.frame).then((metrics) => metrics.url), {
+      message: "SKBP experience URL returns to the list route",
+      timeout: 20_000,
+    })
+    .not.toContain("#skbp");
+  await expect
+    .poll(() => local.frame.locator(".experience__list > [data-a11yway-featured-card='skbp']").count(), {
+      message: "SKBP experience list is restored after closing the detail",
+      timeout: 30_000,
+    })
+    .toBe(1);
+  await expect
+    .poll(() => local.frame.locator(SKBP_DETAIL_IFRAME_SELECTOR).count(), {
+      message: "SKBP close button removes the visible detail iframe",
+      timeout: 10_000,
+    })
+    .toBe(0);
+
+  await context.close();
+});
+
+test("SKBP project route opens the selected detail directly", async ({ page }) => {
+  const viewportSize = { width: 1440, height: 900 };
+  await page.setViewportSize(viewportSize);
+  await page.route(
+    (url) => url.hostname.includes("vimeocdn.com") || url.pathname.endsWith(".mp4"),
+    (route) => route.abort(),
+  );
+
+  await page.goto("/a11yway/skbp", { waitUntil: "domcontentloaded" });
+  await expect(page.getByTestId("skbp-responsive-page")).toBeVisible();
+  await expect(page).toHaveURL(/\/a11yway\/skbp$/);
+
+  const iframe = page.locator("iframe[title='Plus X SKBP responsive reference']");
+  await expect(iframe).toHaveAttribute("data-source-url", "/experience#skbp");
+  const iframeHandle = await iframe.elementHandle();
+  const frame = await iframeHandle?.contentFrame();
+  expect(frame, "SKBP experience iframe is attached").toBeTruthy();
+  await getSkbpDetailFrame(frame);
+});
+
+test("SKBP detail navigation mirrors the selected project into the top-level route", async ({ browser }) => {
+  const viewportSize = { width: 1440, height: 900 };
+  const context = await browser.newContext({ viewport: viewportSize });
+  const localPage = await context.newPage();
+
+  await localPage.route(
+    (url) => url.hostname.includes("vimeocdn.com") || url.pathname.endsWith(".mp4"),
+    (route) => route.abort(),
+  );
+
+  const local = await openLocalSkbp(localPage, viewportSize);
+
+  await local.frame.evaluate(() => {
+    const card = document.querySelector("[data-a11yway-featured-card='skbp']");
+    card?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  });
+  await getSkbpDetailFrame(local.frame);
+  await expect(localPage).toHaveURL(/\/a11yway\/skbp$/);
+
+  await context.close();
+});
+
+test("SKBP original project card navigation mirrors each project slug into the top-level route", async ({ browser }) => {
+  const viewportSize = { width: 1440, height: 900 };
+  const context = await browser.newContext({ viewport: viewportSize });
+  const localPage = await context.newPage();
+
+  await localPage.route(
+    (url) => url.hostname.includes("vimeocdn.com") || url.pathname.endsWith(".mp4"),
+    (route) => route.abort(),
+  );
+
+  const local = await openLocalSkbp(localPage, viewportSize);
+  const projectSlug = await local.frame.evaluate(() => {
+    const links = Array.from(document.querySelectorAll(".experience__list a.item__link"));
+    for (const link of links) {
+      if (!(link instanceof HTMLAnchorElement)) {
+        continue;
+      }
+
+      const slug = new URL(link.href).hash.slice(1);
+      if (slug !== "" && slug !== "skbp") {
+        return slug;
+      }
+    }
+
+    return "";
+  });
+  expect(projectSlug).not.toBe("");
+
+  await local.frame.evaluate((slug) => {
+    const links = Array.from(document.querySelectorAll(".experience__list a.item__link"));
+    const link = links.find((candidate) => candidate instanceof HTMLAnchorElement && new URL(candidate.href).hash.slice(1) === slug);
+    link?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  }, projectSlug);
+  await expect(localPage).toHaveURL(new RegExp(`/a11yway/${escapeRegExp(projectSlug)}$`));
+
+  await context.close();
+});
+
+test("SKBP original project detail return button restores the experience list route", async ({ page }) => {
+  const viewportSize = { width: 1440, height: 900 };
+  await page.setViewportSize(viewportSize);
+  await page.route(
+    (url) => url.hostname.includes("vimeocdn.com") || url.pathname.endsWith(".mp4"),
+    (route) => route.abort(),
+  );
+
+  await page.goto("/a11yway/pledis", { waitUntil: "domcontentloaded" });
+  await expect(page.getByTestId("skbp-responsive-page")).toBeVisible();
+  await expect(page).toHaveURL(/\/a11yway\/pledis$/);
+
+  const iframe = page.locator("iframe[title='Plus X SKBP responsive reference']");
+  const iframeHandle = await iframe.elementHandle();
+  const frame = await iframeHandle?.contentFrame();
+  expect(frame, "SKBP experience iframe is attached").toBeTruthy();
+
+  const returnButton = frame.locator("button.button__arrow.bottom");
+  await expect(returnButton).toBeVisible({ timeout: 20_000 });
+  await returnButton.click();
+
+  await expect(page).toHaveURL(/\/a11yway#skbp$/);
+  await expect
+    .poll(() => readExperienceMetrics(frame).then((metrics) => metrics.url), {
+      message: "original project return button resets the experience iframe to the list route",
+      timeout: 20_000,
+    })
+    .toMatch(/\/experience$/);
+  await expect
+    .poll(() => frame.locator("iframe[src*='/source/iframe/portfolio/']").count(), {
+      message: "original project return button removes the portfolio detail iframe",
+      timeout: 10_000,
+    })
+    .toBe(0);
 });
 
 test("BPCO root remains the default route", async ({ page }) => {

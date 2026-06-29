@@ -26,6 +26,18 @@ const TUNIVERSE_LOCAL_STYLE = `
 }
 </style>`;
 
+const SCRIPT_JSON_ESCAPES: Record<string, string> = {
+  "&": "\\u0026",
+  "<": "\\u003C",
+  ">": "\\u003E",
+  "\u2028": "\\u2028",
+  "\u2029": "\\u2029",
+};
+
+function toScriptJson(value: string): string {
+  return JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, (character) => SCRIPT_JSON_ESCAPES[character] ?? character);
+}
+
 function createTuniverseOverviewScript(): string {
   return `<script id="a11yway-overview-content">
 (() => {
@@ -40,13 +52,13 @@ function createTuniverseOverviewScript(): string {
   const graph = overview.querySelector(".graph-wrap");
 
   if (badge !== null) {
-    badge.textContent = ${JSON.stringify(TUNIVERSE_OVERVIEW_BADGE)};
+    badge.textContent = ${toScriptJson(TUNIVERSE_OVERVIEW_BADGE)};
   }
   if (title !== null) {
-    title.innerHTML = ${JSON.stringify(TUNIVERSE_OVERVIEW_TITLE)};
+    title.innerHTML = ${toScriptJson(TUNIVERSE_OVERVIEW_TITLE)};
   }
   if (description !== null) {
-    description.innerHTML = ${JSON.stringify(TUNIVERSE_OVERVIEW_DESCRIPTION.map((line) => `<span>${line}</span>`).join(""))};
+    description.innerHTML = ${toScriptJson(TUNIVERSE_OVERVIEW_DESCRIPTION.map((line) => `<span>${line}</span>`).join(""))};
   }
   if (graph !== null) {
     graph.innerHTML = "";

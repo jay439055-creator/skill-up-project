@@ -3,7 +3,11 @@ import * as THREE from "three";
 export const QUEST_MODEL_BASE_PATH = "/models/meta-quest3s/";
 export const QUEST_MODEL_FILE = "Quest3S_A11yway_PBR.glb";
 export const QUEST_MODEL_SOURCE = `${QUEST_MODEL_BASE_PATH}${QUEST_MODEL_FILE}`;
+export const QUEST_UI_PANEL_TEXTURE_FILE = "a11yway-ui-panel.png";
+export const QUEST_UI_PANEL_TEXTURE_SOURCE = `${QUEST_MODEL_BASE_PATH}${QUEST_UI_PANEL_TEXTURE_FILE}`;
 export const QUEST_MOTION_DURATION_MS = 4_600;
+
+const QUEST_UI_PANEL_NODE = "A11yway_UI_Panel";
 
 function easeInOut(value: number): number {
   return value * value * (3 - 2 * value);
@@ -31,18 +35,27 @@ function disposeMaterial(material: THREE.Material, disposedTextures: Set<THREE.T
   material.dispose();
 }
 
+function disposeObjectMaterial(material: THREE.Material | THREE.Material[], disposedTextures: Set<THREE.Texture>): void {
+  if (Array.isArray(material)) {
+    for (const item of material) {
+      disposeMaterial(item, disposedTextures);
+    }
+    return;
+  }
+  disposeMaterial(material, disposedTextures);
+}
+
 export function disposeObject(object: THREE.Object3D): void {
   const disposedTextures = new Set<THREE.Texture>();
   object.traverse((node) => {
     if (node instanceof THREE.Mesh) {
       node.geometry.dispose();
-      if (Array.isArray(node.material)) {
-        for (const material of node.material) {
-          disposeMaterial(material, disposedTextures);
-        }
-        return;
-      }
-      disposeMaterial(node.material, disposedTextures);
+      disposeObjectMaterial(node.material, disposedTextures);
+      return;
+    }
+    if (node instanceof THREE.Line) {
+      node.geometry.dispose();
+      disposeObjectMaterial(node.material, disposedTextures);
     }
   });
 }
@@ -62,22 +75,47 @@ export function normalizeQuestModel(object: THREE.Object3D): void {
   object.position.copy(center).multiplyScalar(-scale);
 }
 
-export function configureQuestModel(object: THREE.Object3D): void {
+export function configureQuestModel(object: THREE.Object3D, uiPanelTexture: THREE.Texture | null): void {
   object.traverse((node) => {
     if (!(node instanceof THREE.Mesh)) {
       return;
     }
     node.frustumCulled = false;
     node.geometry.computeVertexNormals();
+    if (node.name === QUEST_UI_PANEL_NODE) {
+      node.renderOrder = 12;
+      if (uiPanelTexture !== null) {
+        disposeObjectMaterial(node.material, new Set<THREE.Texture>());
+        node.material = new THREE.MeshPhysicalMaterial({
+          clearcoat: 1,
+          clearcoatRoughness: 0.06,
+          map: uiPanelTexture,
+          metalness: 0.08,
+          roughness: 0.1,
+          side: THREE.DoubleSide,
+          toneMapped: true,
+        });
+      }
+    }
   });
 }
 
 export function syncQuestHeroMotion(modelGroup: THREE.Group, time: number): void {
-  const cycle = (time % QUEST_MOTION_DURATION_MS) / QUEST_MOTION_DURATION_MS;
-  const reveal = cycle < 0.82 ? easeInOut(rangeProgress(cycle, 0.04, 0.66)) : 1 - easeInOut(rangeProgress(cycle, 0.9, 1));
-  const floatY = Math.sin(cycle * Math.PI * 2) * 0.014;
+  const progress = clamp01(time / QUEST_MOTION_DURATION_MS);
+  const rotationProgress = easeInOut(rangeProgress(progress, 0.075, 0.31));
+  const approachProgress = easeInOut(rangeProgress(progress, 0.1, 0.38));
+  const settleLift = Math.sin(progress * Math.PI) * 0.006;
 
-  modelGroup.rotation.set(-0.085 + reveal * 0.07, 0.74 - reveal * 0.74, 0.03 - reveal * 0.028);
-  modelGroup.position.set(0.18 - reveal * 0.18, -0.1 + floatY, -0.2 + reveal * 0.12);
-  modelGroup.scale.setScalar(0.72 + reveal * 0.18);
+  modelGroup.rotation.set(
+    -0.12 - rotationProgress * 0.105,
+    0.82 - rotationProgress * 0.16,
+    0.03 - rotationProgress * 0.014,
+  );
+  modelGroup.position.set(
+    0.02 - rotationProgress * 0.25,
+    -0.49 + approachProgress * 0.008 + settleLift,
+    -0.22 + approachProgress * 0.06,
+  );
+  const finalScale = 0.58 + approachProgress * 0.205;
+  modelGroup.scale.set(finalScale * 0.93, finalScale * 1.06, finalScale);
 }

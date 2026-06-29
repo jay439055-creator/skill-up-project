@@ -5,11 +5,12 @@ import "./SkbpResponsivePage.css";
 import { absolutizeTuniverseHtml } from "./tuniverseOverrides";
 
 type ExperienceReferenceLayout = "iframeOnly" | "a11ywayHero";
+type ExperienceReferenceSlug = "skbp" | "tuniverse";
 
 type ExperienceReferenceConfig = {
   readonly iframeTitle: string;
   readonly layout: ExperienceReferenceLayout;
-  readonly slug: string;
+  readonly slug: ExperienceReferenceSlug;
   readonly testId: string;
   readonly url: string;
 };
@@ -19,7 +20,7 @@ const SKBP_REFERENCE = {
   layout: "iframeOnly",
   slug: "skbp",
   testId: "skbp-responsive-page",
-  url: "https://www.plus-ex.com/experience#skbp",
+  url: "/experience",
 } as const satisfies ExperienceReferenceConfig;
 
 const TUNIVERSE_REFERENCE = {
@@ -30,9 +31,74 @@ const TUNIVERSE_REFERENCE = {
   url: "https://www.plus-ex.com/source/iframe/portfolio/tuniverse.html",
 } as const satisfies ExperienceReferenceConfig;
 
+const EXPERIENCE_ROUTE_MESSAGE_TYPE = "a11yway:experience-route";
+const SKBP_EXPERIENCE_ROUTE = "/experience";
+const SKBP_TOP_LIST_ROUTE = "/a11yway#skbp";
+const SKBP_TOP_DETAIL_PREFIX = "/a11yway/";
+
+type ExperienceRouteNavigationType = "push" | "replace";
+
+type ExperienceRouteMessage = {
+  readonly hash: string;
+  readonly navigationType: ExperienceRouteNavigationType;
+  readonly pathname: string;
+  readonly type: typeof EXPERIENCE_ROUTE_MESSAGE_TYPE;
+};
+
 const getViewportSignature = (): string => `${window.innerWidth}x${window.innerHeight}`;
 
+function decodeRoutePart(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function getA11ywayDetailProjectSlug(pathname: string): string | null {
+  if (!pathname.startsWith(SKBP_TOP_DETAIL_PREFIX)) {
+    return null;
+  }
+
+  const routePart = pathname.slice(SKBP_TOP_DETAIL_PREFIX.length).replace(/\/$/, "");
+  if (routePart === "" || routePart.includes("/")) {
+    return null;
+  }
+
+  return decodeRoutePart(routePart);
+}
+
+function getExperienceHashProjectSlug(hash: string): string | null {
+  const routePart = hash.startsWith("#") ? hash.slice(1) : hash;
+  return routePart === "" ? null : decodeRoutePart(routePart);
+}
+
+function getLegacyA11ywayHashProjectSlug(pathname: string, hash: string): string | null {
+  if (pathname !== "/a11yway" || hash === "" || hash === "#skbp" || hash === "#tuniverse") {
+    return null;
+  }
+
+  return getExperienceHashProjectSlug(hash);
+}
+
+function getSkbpReferenceConfigForProject(projectSlug: string): ExperienceReferenceConfig {
+  return {
+    ...SKBP_REFERENCE,
+    url: `${SKBP_EXPERIENCE_ROUTE}#${encodeURIComponent(projectSlug)}`,
+  };
+}
+
 export function getExperienceReferenceConfig(pathname: string, hash: string): ExperienceReferenceConfig | null {
+  const pathProjectSlug = getA11ywayDetailProjectSlug(pathname);
+  if (pathProjectSlug !== null) {
+    return getSkbpReferenceConfigForProject(pathProjectSlug);
+  }
+
+  const hashProjectSlug = getLegacyA11ywayHashProjectSlug(pathname, hash);
+  if (hashProjectSlug !== null) {
+    return getSkbpReferenceConfigForProject(hashProjectSlug);
+  }
+
   switch (`${pathname}${hash}`) {
     case "/a11yway#skbp":
       return SKBP_REFERENCE;
@@ -53,14 +119,109 @@ type ExperienceReferencePageProps = {
   readonly config: ExperienceReferenceConfig;
 };
 
+function isSkbpExperienceReference(config: ExperienceReferenceConfig): boolean {
+  return config.slug === "skbp" && config.layout === "iframeOnly";
+}
+
+function isExperienceRouteMessage(value: unknown): value is ExperienceRouteMessage {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  return (
+    "type" in value &&
+    value.type === EXPERIENCE_ROUTE_MESSAGE_TYPE &&
+    "pathname" in value &&
+    value.pathname === SKBP_EXPERIENCE_ROUTE &&
+    "hash" in value &&
+    typeof value.hash === "string" &&
+    "navigationType" in value &&
+    (value.navigationType === "push" || value.navigationType === "replace")
+  );
+}
+
+function getTopRouteForExperienceHash(hash: string): string {
+  const projectSlug = getExperienceHashProjectSlug(hash);
+  return projectSlug === null ? SKBP_TOP_LIST_ROUTE : `${SKBP_TOP_DETAIL_PREFIX}${encodeURIComponent(projectSlug)}`;
+}
+
+function getExperienceRouteForTopRoute(pathname: string, hash: string): string {
+  const pathProjectSlug = getA11ywayDetailProjectSlug(pathname);
+  if (pathProjectSlug !== null) {
+    return `${SKBP_EXPERIENCE_ROUTE}#${encodeURIComponent(pathProjectSlug)}`;
+  }
+
+  const hashProjectSlug = getLegacyA11ywayHashProjectSlug(pathname, hash);
+  if (hashProjectSlug !== null) {
+    return `${SKBP_EXPERIENCE_ROUTE}#${encodeURIComponent(hashProjectSlug)}`;
+  }
+
+  return SKBP_EXPERIENCE_ROUTE;
+}
+
 export function ExperienceReferencePage({ config }: ExperienceReferencePageProps) {
   const [viewportSignature, setViewportSignature] = useState(getViewportSignature);
-  const [tuniverseDocument, setTuniverseDocument] = useState<string | null>(null);
+  const [referenceDocument, setReferenceDocument] = useState<string | null>(null);
   const [tuniverseFrameHeight, setTuniverseFrameHeight] = useState<number | null>(null);
-  const [tuniverseLoadFailed, setTuniverseLoadFailed] = useState(false);
+  const [referenceLoadFailed, setReferenceLoadFailed] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const hasA11ywayHero = config.layout === "a11ywayHero";
-  const shouldRenderTuniverseSrcDoc = hasA11ywayHero && tuniverseDocument !== null && !tuniverseLoadFailed;
+  const shouldLoadReferenceSrcDoc = hasA11ywayHero;
+  const shouldRenderReferenceSrcDoc = shouldLoadReferenceSrcDoc && referenceDocument !== null && !referenceLoadFailed;
+
+  useEffect(() => {
+    if (!isSkbpExperienceReference(config)) {
+      return undefined;
+    }
+
+    const handleExperienceRouteMessage = (event: MessageEvent<unknown>) => {
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+
+      if (!isExperienceRouteMessage(event.data)) {
+        return;
+      }
+
+      const targetRoute = getTopRouteForExperienceHash(event.data.hash);
+      const currentRoute = `${window.location.pathname}${window.location.hash}`;
+      if (currentRoute === targetRoute) {
+        return;
+      }
+
+      if (event.data.navigationType === "replace") {
+        window.history.replaceState(null, "", targetRoute);
+        return;
+      }
+
+      window.history.pushState(null, "", targetRoute);
+    };
+
+    window.addEventListener("message", handleExperienceRouteMessage);
+    return () => window.removeEventListener("message", handleExperienceRouteMessage);
+  }, [config]);
+
+  useEffect(() => {
+    if (!isSkbpExperienceReference(config)) {
+      return undefined;
+    }
+
+    const syncFrameToTopRoute = () => {
+      const frameWindow = iframeRef.current?.contentWindow;
+      if (frameWindow === null || frameWindow === undefined) {
+        return;
+      }
+
+      const targetRoute = getExperienceRouteForTopRoute(window.location.pathname, window.location.hash);
+      const currentRoute = `${frameWindow.location.pathname}${frameWindow.location.hash}`;
+      if (currentRoute !== targetRoute) {
+        frameWindow.location.assign(targetRoute);
+      }
+    };
+
+    window.addEventListener("popstate", syncFrameToTopRoute);
+    return () => window.removeEventListener("popstate", syncFrameToTopRoute);
+  }, [config]);
 
   const updateTuniverseFrameHeight = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
@@ -77,13 +238,13 @@ export function ExperienceReferencePage({ config }: ExperienceReferencePageProps
     );
   }, []);
 
-  const handleTuniverseFrameLoad = useCallback(() => {
-    if (!shouldRenderTuniverseSrcDoc) {
+  const handleReferenceFrameLoad = useCallback(() => {
+    if (!shouldRenderReferenceSrcDoc || !hasA11ywayHero) {
       return;
     }
 
     window.requestAnimationFrame(updateTuniverseFrameHeight);
-  }, [shouldRenderTuniverseSrcDoc, updateTuniverseFrameHeight]);
+  }, [hasA11ywayHero, shouldRenderReferenceSrcDoc, updateTuniverseFrameHeight]);
 
   useEffect(() => {
     document.documentElement.classList.add("skbp-responsive-mode");
@@ -122,7 +283,7 @@ export function ExperienceReferencePage({ config }: ExperienceReferencePageProps
   }, [hasA11ywayHero]);
 
   useEffect(() => {
-    if (!hasA11ywayHero) {
+    if (!shouldLoadReferenceSrcDoc) {
       return undefined;
     }
 
@@ -137,8 +298,8 @@ export function ExperienceReferencePage({ config }: ExperienceReferencePageProps
           return;
         }
 
-        setTuniverseDocument(absolutizeTuniverseHtml(html, config.url));
-        setTuniverseLoadFailed(false);
+        setReferenceDocument(absolutizeTuniverseHtml(html, config.url));
+        setReferenceLoadFailed(false);
       })
       .catch((error: unknown) => {
         if (error instanceof Error && error.name === "AbortError") {
@@ -146,7 +307,7 @@ export function ExperienceReferencePage({ config }: ExperienceReferencePageProps
         }
 
         if (error instanceof Error) {
-          setTuniverseLoadFailed(true);
+          setReferenceLoadFailed(true);
           return;
         }
 
@@ -157,10 +318,10 @@ export function ExperienceReferencePage({ config }: ExperienceReferencePageProps
       isActive = false;
       controller.abort();
     };
-  }, [config.url, hasA11ywayHero]);
+  }, [config, shouldLoadReferenceSrcDoc]);
 
   useEffect(() => {
-    if (!shouldRenderTuniverseSrcDoc) {
+    if (!shouldRenderReferenceSrcDoc || !hasA11ywayHero) {
       return undefined;
     }
 
@@ -205,14 +366,14 @@ export function ExperienceReferencePage({ config }: ExperienceReferencePageProps
       resizeObserver.disconnect();
       frameWindow.removeEventListener("resize", scheduleHeightUpdate);
     };
-  }, [shouldRenderTuniverseSrcDoc, updateTuniverseFrameHeight, viewportSignature]);
+  }, [hasA11ywayHero, shouldRenderReferenceSrcDoc, updateTuniverseFrameHeight, viewportSignature]);
 
   const detailShellStyle: TuniverseShellStyle | undefined =
     hasA11ywayHero && tuniverseFrameHeight !== null
       ? { "--tuniverse-frame-height": `${tuniverseFrameHeight}px` }
       : undefined;
-  const frameSrc = hasA11ywayHero ? undefined : config.url;
-  const frameSrcDoc = shouldRenderTuniverseSrcDoc ? tuniverseDocument : undefined;
+  const frameSrc = shouldLoadReferenceSrcDoc ? undefined : config.url;
+  const frameSrcDoc = shouldRenderReferenceSrcDoc ? referenceDocument : undefined;
 
   return (
     <main
@@ -226,7 +387,7 @@ export function ExperienceReferencePage({ config }: ExperienceReferencePageProps
           className={`skbp-responsive-frame skbp-responsive-frame--${config.layout}`}
           data-source-url={config.url}
           key={viewportSignature}
-          onLoad={handleTuniverseFrameLoad}
+          onLoad={handleReferenceFrameLoad}
           ref={iframeRef}
           src={frameSrc}
           srcDoc={frameSrcDoc}

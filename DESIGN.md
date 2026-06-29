@@ -14,7 +14,9 @@ This React page is a fidelity clone of `https://www.bpco.kr/`. The visual source
 - `--color-white`: `#ffffff` for active nav text and project-card overlay rules.
 - `--color-tv-black`: `#000000` for TV/noise underside surfaces.
 - `--color-a11yway-quest-floor`: `#f3f4f6` for the a11yway Quest hero floor.
-- `--shadow-a11yway-quest-product`: `drop-shadow(0 44px 48px rgba(28, 35, 48, 0.18))` for the floating Quest headset depth.
+- `--color-a11yway-quest-visor`: `#050607` for the glossy black Quest visor/screen surface.
+- `--color-a11yway-quest-ui-glow`: `#9ddfff` for generated internal card glow and status light.
+- `--shadow-a11yway-quest-product`: `drop-shadow(0 54px 58px rgba(25, 33, 48, 0.24)) drop-shadow(0 18px 24px rgba(103, 118, 148, 0.18))` for the floating Quest headset depth.
 
 ## 3. Typography
 
@@ -43,7 +45,7 @@ This React page is a fidelity clone of `https://www.bpco.kr/`. The visual source
 - `.project_list`: source-style recent-project list and table.
 - `.main.m4`: business wheel and TV transition chapter.
 - `footer`: SAY HI canvas and company information layout.
-- `A11ywayQuestHeroCanvas`: fixed-format Three.js layer inside the a11yway hero, using the Blender-exported `Quest3S_A11yway_PBR.glb` asset from `scripts/rebuild-quest3s-glb.py` with smoothed normals, softened product edges, warm white polycarbonate, glossy black lenses, brightened woven strap/pad texture derivatives, rubber, and satin metal material roles.
+- `A11ywayQuestHeroCanvas`: fixed-format Three.js layer inside the a11yway hero, using the Blender-exported `Quest3S_A11yway_PBR.glb` asset from `scripts/rebuild-quest3s-glb.py` with smoothed normals, softened product edges, warm white polycarbonate, glossy black lenses, brightened woven strap/pad texture derivatives, rubber, satin metal material roles, a generated glossy black visor mesh, generated internal UI card textures, and a real Three.js floor-shadow plane.
 
 ## 6. Motion Tokens
 
@@ -52,7 +54,7 @@ This React page is a fidelity clone of `https://www.bpco.kr/`. The visual source
 - The first project card must not jump to an oversized state; wide reveal timing is checked at `1970x1118` and `scrollY=9000`.
 - The bottom TV face and underside overlay must use animated shader/noise distortion, not a static distorted image.
 - Late project-to-business transition must flatten the underside before the business section takes over.
-- A11yway Quest hero motion follows the Meta Quest 3S detail-video cadence: left three-quarter product angle, subtle float, then a front-facing close-up without side data cards, artificial front-panel overlays, or a clipped hero boundary.
+- A11yway Quest hero motion follows the Meta Quest 3S detail-video cadence: left three-quarter product angle, subtle float, then a front-facing premium close-up with generated visor UI cards. Runtime motion must finish at `4600ms` and stop rather than loop.
 
 ## 7. Fidelity Rules
 

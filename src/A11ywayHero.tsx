@@ -24,15 +24,24 @@ const HERO_LAYERS = [
     src: `${HERO_ASSET_PATH}/vr-machine.svg`,
     testId: "a11yway-hero-device",
   },
+  {
+    alt: "A11yway Quest headset with accessible VR controls",
+    className: "a11yway-hero__asset a11yway-hero__asset--reference",
+    src: `${HERO_ASSET_PATH}/reference-hero.png`,
+    testId: "a11yway-hero-reference",
+  },
 ] as const satisfies readonly HeroLayer[];
 
+type QuestRendererState = "loading" | "ready" | "failed";
+
 export function A11ywayHero() {
-  const [questRendererReady, setQuestRendererReady] = useState(false);
-  const handleQuestReady = useCallback(() => setQuestRendererReady(true), []);
+  const [questRendererState, setQuestRendererState] = useState<QuestRendererState>("loading");
+  const handleQuestError = useCallback(() => setQuestRendererState("failed"), []);
+  const handleQuestReady = useCallback(() => setQuestRendererState("ready"), []);
 
   return (
     <section className="a11yway-hero" data-testid="a11yway-hero" aria-label="a11yway hero">
-      <div className="a11yway-hero__stage" data-quest-renderer-ready={questRendererReady ? "true" : undefined}>
+      <div className="a11yway-hero__stage" data-quest-renderer-state={questRendererState}>
         {HERO_LAYERS.map((layer) => (
           <img
             alt={layer.alt}
@@ -43,7 +52,7 @@ export function A11ywayHero() {
             src={layer.src}
           />
         ))}
-        <A11ywayQuestHeroCanvas onReady={handleQuestReady} />
+        <A11ywayQuestHeroCanvas onError={handleQuestError} onReady={handleQuestReady} />
       </div>
     </section>
   );
